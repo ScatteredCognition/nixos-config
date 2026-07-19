@@ -22,4 +22,16 @@
       ];
     };
   };
+
+  environment.systemPackages = [ pkgs.wl-clipboard ]; # for wl-copy to work
+
+  # Fancy GUI SSH auth
+  programs.ssh = {
+    startAgent = true; # starts ssh-agent as a systemd user service
+    enableAskPassword = true; # sets SSH_ASKPASS to ksshaskpass automatically
+  };
+
+  environment.variables = {
+    SSH_ASKPASS_REQUIRE = "prefer"; # use GUI askpass even when a terminal is present
+  };
 }

@@ -24,6 +24,7 @@
   # Distrobox and container-stuff
   ++ [
     pkgs.distrobox
+    pkgs.podman-compose
     pkgs.docker-compose
   ];
 
