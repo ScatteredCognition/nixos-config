@@ -25,7 +25,7 @@
     pkgs.distrobox
     pkgs.podman-compose
     pkgs.docker-compose
-  ]
+  ];
 
   # Cloudflare WARP
   services.cloudflare-warp.enable = true;
