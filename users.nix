@@ -1,13 +1,13 @@
 # users.nix
 
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
 {
   users.users.faeizmahrus = {
     isNormalUser = true;
     extraGroups = [ "wheel" ];
     hashedPassword = "";
-    packages = with pkgs; [ ];
+    # packages = with pkgs; [ ];
 
     shell = pkgs.fish;
   };

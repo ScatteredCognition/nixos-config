@@ -3,9 +3,12 @@
 {
   zramSwap = {
     enable = true;
-    algorithm = "zstd"; # best compression ratio for zram
-    memoryPercent = 50; # zram device size = 50% of RAM
+    # best compression ratio for zram
+    algorithm = "zstd";
+    # zram device size = 50% of RAM
+    memoryPercent = 50;
   };
 
-  swapDevices = [ ]; # explicitly no disk-backed swap
+  # explicitly no disk-backed swap
+  swapDevices = [ ];
 }

@@ -33,7 +33,8 @@
     {
       nixosConfigurations.myhost = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
-        specialArgs = { inherit inputs; }; # Every child module gets access to the inputs defined (needed for Zen browser in apps.nix)
+        # Every child module gets access to the inputs defined (needed for Zen browser in apps.nix)
+        specialArgs = { inherit inputs; };
         modules = [
           # inputs modules
           inputs.disko.nixosModules.disko
@@ -47,6 +48,7 @@
           ./zram.nix
           ./tpm2.nix
           ./hardware-configuration.nix
+          ./kargs.nix
           ./users.nix
 
           # Apps etc
