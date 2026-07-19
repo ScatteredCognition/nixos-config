@@ -25,6 +25,12 @@
     pkgs.distrobox
     pkgs.podman-compose
     pkgs.docker-compose
+  ]
+
+  # Videogame stuff
+  ++ [
+    pkgs.xonotic
+    pkgs.retroarch-full
   ];
 
   # Cloudflare WARP
