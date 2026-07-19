@@ -55,10 +55,6 @@
           ./apps.nix
           ./font-fix.nix
 
-          # So the nixpkgs entry propagates out to everything (user nix profiles too)
-          {
-            nix.registry.nixpkgs.flake = nixpkgs;
-          }
         ];
       };
     };
