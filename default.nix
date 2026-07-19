@@ -1,5 +1,5 @@
 # default.nix
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 
 {
   # NixOS Version + allow unfree
@@ -10,7 +10,12 @@
     "flakes"
   ];
 
-  ## For per-user normal nix
+  # For per-user normal nix
+  ## Propagate system nixpkgs to nix and legacy tools
+  registry.nixpkgs.flake = inputs.nixpkgs;
+  nixPath = [ "nixpkgs=${inputs.nixpkgs}" ];
+
+  ## Allow unfree for nix (the package manager)
   environment.etc."nix/nixpkgs-config.nix".text = ''
     { allowUnfree = true; }
   '';
