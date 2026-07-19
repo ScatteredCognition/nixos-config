@@ -1,5 +1,6 @@
 # flake.nix
 
+# Inputs
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
@@ -21,32 +22,38 @@
     };
   };
 
+  # Outputs
   outputs =
     {
       self,
       nixpkgs,
       zen-browser,
       ...
-    }@inputs:
+    }@inputs: # destructures the previous variables into individual keys
     {
       nixosConfigurations.myhost = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
-        specialArgs = { inherit inputs; };
+        specialArgs = { inherit inputs; }; # Every child module gets access to the inputs defined (needed for Zen browser in apps.nix)
         modules = [
+          # inputs modules
           inputs.disko.nixosModules.disko
           inputs.lanzaboote.nixosModules.lanzaboote
           inputs.nix-flatpak.nixosModules.nix-flatpak
+
+          # System stuff
+          ./default.nix
           ./disko.nix
+          ./lanzaboote.nix # <-- add ONLY after first successful boot, see steps below
           ./zram.nix
           ./tpm2.nix
-          ./lanzaboote.nix # <-- add ONLY after first successful boot, see steps below
           ./hardware-configuration.nix
-          ./apps.nix
-          ./font-fix.nix
-          ./default.nix
+          ./users.nix
+
+          # Apps etc
           ./kde-desktop.nix
           ./lang-bangla.nix
-          ./users.nix
+          ./apps.nix
+          ./font-fix.nix
         ];
       };
     };
