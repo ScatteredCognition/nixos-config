@@ -12,8 +12,10 @@
 
   # For per-user normal nix
   ## Propagate system nixpkgs to nix and legacy tools
-  registry.nixpkgs.flake = inputs.nixpkgs;
-  nixPath = [ "nixpkgs=${inputs.nixpkgs}" ];
+  nix = {
+    registry.nixpkgs.flake = inputs.nixpkgs;
+    nixPath = [ "nixpkgs=${inputs.nixpkgs}" ];
+  };
 
   ## Allow unfree for nix (the package manager)
   environment.etc."nix/nixpkgs-config.nix".text = ''
