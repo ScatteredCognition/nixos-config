@@ -10,6 +10,11 @@
     "flakes"
   ];
 
+  ## For per-user normal nix
+  environment.etc."nix/nixpkgs-config.nix".text = ''
+    { allowUnfree = true; }
+  '';
+
   # Boot stuff
   boot = {
     loader = {
