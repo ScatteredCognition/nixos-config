@@ -43,6 +43,9 @@
     pkgs.docker-compose
   ];
 
+  # MS Corefonts
+  fonts.packages = [ pkgs.corefonts ];
+
   # Cloudflare WARP
   services.cloudflare-warp.enable = true;
 
@@ -61,7 +64,8 @@
     podman = {
       enable = true;
       dockerCompat = true;
-      defaultNetwork.settings.dns_enabled = true; # Required for containers under podman-compose to be able to talk to each other.
+      # Required for containers under podman-compose to be able to talk to each other.
+      defaultNetwork.settings.dns_enabled = true;
     };
   };
 
@@ -75,7 +79,4 @@
       }
     ];
   };
-
-  # MS Corefonts
-  fonts.packages = [ pkgs.corefonts ];
 }
