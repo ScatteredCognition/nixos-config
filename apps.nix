@@ -7,7 +7,7 @@
     inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
     pkgs.qbittorrent
     # pkgs.onlyoffice-desktopeditors # Has issues finding fonts even after applying workarounds, use the flatpak
-    # pkgs.libreoffice-qt6-fresh # bloated, only enable if you need it
+    pkgs.libreoffice-qt6-fresh # bloated, only enable if you need it
     pkgs.zed-editor
     pkgs.krita
     pkgs.kdePackages.kdenlive
