@@ -52,10 +52,14 @@
     fontDir.enable = true; # symlinks all host fonts to /run/current-system/sw/share/X11/fonts
   };
 
-  # Enable all firmwares incl. proprietary
+  # Hardware stuff
+  ## Power Management
+  powerManagement.enable = true;
+
+  ## Enable all firmwares incl. proprietary
   hardware.enableAllFirmware = true;
 
-  # Bluetooth stuff
+  ## Bluetooth stuff
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
