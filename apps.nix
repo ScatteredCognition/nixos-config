@@ -12,7 +12,6 @@
     pkgs.krita
     pkgs.kdePackages.kdenlive
     pkgs.blender
-    pkgs.git
   ]
 
   # Nix LSP support

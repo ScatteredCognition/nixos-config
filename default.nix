@@ -80,6 +80,7 @@
 
   # Extra programs to enable
   environment.systemPackages = [
+    pkgs.git
     pkgs.fastfetch
   ]
 
