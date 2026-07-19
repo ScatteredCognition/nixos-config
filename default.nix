@@ -100,13 +100,13 @@
   ];
 
   # Desktop stuff
+  ## rtkit helps pipewire latency
+  security.rtkit.enable = true;
   services = {
     # xserver.enable = true; # X11
     libinput.enable = true; # Input stack
     printing.enable = true; # Printing stack
     # Audio stack
-    ## rtkit helps pipewire latency
-    security.rtkit.enable = true;
     pipewire = {
       enable = true;
       pulse.enable = true;
