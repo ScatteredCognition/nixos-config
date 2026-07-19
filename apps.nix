@@ -1,5 +1,10 @@
 # apps.nix
-{ pkgs, inputs, ... }:
+{
+  pkgs,
+  inputs,
+  config,
+  ...
+}:
 
 {
   environment.systemPackages = [
@@ -7,11 +12,22 @@
     inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
     pkgs.qbittorrent
     # pkgs.onlyoffice-desktopeditors # Has issues finding fonts even after applying workarounds, use the flatpak
-    pkgs.libreoffice-qt6-fresh # bloated, only enable if you need it
     pkgs.zed-editor
     pkgs.krita
     pkgs.kdePackages.kdenlive
     pkgs.blender
+  ]
+
+  # Conditional statement to install GTK/Qt variants depending on whether GNOME is installed
+  ++ [
+    (
+      if config.services.desktopManager.gnome.enable then
+        # Install if GNOME installed
+        pkgs.libreoffice-fresh
+      else
+        # Install if GNOME isn't installed
+        pkgs.libreoffice-qt6-fresh
+    )
   ]
 
   # Nix LSP support
