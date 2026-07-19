@@ -6,7 +6,7 @@
     # Basic apps
     inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
     pkgs.qbittorrent
-    # pkgs.onlyoffice-desktopeditors # Has issues finding fonts even after applying workarounds
+    # pkgs.onlyoffice-desktopeditors # Has issues finding fonts even after applying workarounds, use the flatpak
     pkgs.libreoffice-qt6-fresh
     pkgs.zed-editor
     pkgs.krita
@@ -51,7 +51,15 @@
   };
 
   # Flatpak
-  services.flatpak.enable = true;
+  services.flatpak = {
+    enable = true;
+    remotes = [
+      {
+        name = "flathub";
+        location = "https://dl.flathub.org/repo/flathub.flatpakrepo";
+      }
+    ];
+  };
 
   # MS Corefonts
   fonts.packages = [ pkgs.corefonts ];

@@ -18,4 +18,4 @@
 
 ## Creating new deployments
 Run `sudo nixos-rebuild switch --flake
- .#myhost` to interate and deploy new derivations
+ path:$PWD#myhost` to interate and deploy new derivations

@@ -1,10 +1,5 @@
 # default.nix
-{
-  pkgs,
-  config,
-  lib,
-  ...
-}:
+{ pkgs, ... }:
 
 {
   # NixOS Version + allow unfree
