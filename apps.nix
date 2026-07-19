@@ -27,12 +27,6 @@
     pkgs.docker-compose
   ]
 
-  # Videogame stuff
-  ++ [
-    pkgs.xonotic
-    pkgs.retroarch-full
-  ];
-
   # Cloudflare WARP
   services.cloudflare-warp.enable = true;
 

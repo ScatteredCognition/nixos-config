@@ -54,7 +54,6 @@
           ./lang-bangla.nix
           ./apps.nix
           ./font-fix.nix
-
         ];
       };
     };
