@@ -2,16 +2,16 @@
 
 ## Installation
 1. Copy this repo into a USB stick or smth (hence referred to as `nconf`)
-2. Boot into NixOS LiveISO
-  2.1. `cd` into `$(nconf)` directory 
+2. Boot into NixOS LiveISO  
+  2.1. `cd` into `$(nconf)` directory
 3. Change `disko.nix`:`device = "/dev/nvme0n1";` to whatever disk you wanna nuke
 4. Run `sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko/latest -- --mode destroy,format,mount ./disko.nix`
-5. Now the sacrifice disk has been thoroughly cleansed for the new soul to possess it
+5. Now the sacrifice disk has been thoroughly cleansed for the new soul to possess it  
   5.1. It is mounted under `/mnt`
 6. Run `sudo nixos-generate-config --root /mnt --no-filesystems`
-7. Run `cp /mnt/etc/nixos/hardware-configuration.nix ./hardware-configuration.nix`
+7. Run `cp /mnt/etc/nixos/hardware-configuration.nix ./hardware-configuration.nix`  
   7.1. Run `rm ./hardware-configuration.nix` to remove any pre-existing hardware-specific config
-8. Comment out `flake.nix`:`./lanzaboot.nix` line
-  8.1. If you don't need or want SecureBoot, you can just keep it commented out
-  8.2. Optionally, comment out `flake.nix`:`./lang-bangla.nix`,`./tpm2.nix` lines if you don't need the Bangla-specific stuff or TPM2 support
+8. Comment out `flake.nix`:`./lanzaboot.nix` line  
+  8.1. If you don't need or want SecureBoot, you can just keep it commented out  
+  8.2. Optionally, comment out `flake.nix`:`./lang-bangla.nix`,`./tpm2.nix` lines if you don't need the Bangla-specific stuff or TPM2 support  
 9. Finally, run `sudo nixos-install --flake .#myhost --no-root-password`
