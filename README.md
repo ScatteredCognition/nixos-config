@@ -1,9 +1,9 @@
 # nixos-config
 
 ## Installation
-1. Copy this repo into a USB stick or smth (hence referred to as `nconf`)
+1. Copy this repo into a USB stick or smth (path to the base of this repo is referred to as `./`)
 2. Boot into NixOS LiveISO  
-  2.1. `cd` into `$(nconf)` directory
+  2.1. `cd` into wherever you copied this repo
 3. Change `disko.nix`:`device = "/dev/nvme0n1";` to whatever disk you wanna nuke
 4. Run `sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko/latest -- --mode destroy,format,mount ./disko.nix`
 5. Now the sacrifice disk has been thoroughly cleansed for the new soul to possess it  

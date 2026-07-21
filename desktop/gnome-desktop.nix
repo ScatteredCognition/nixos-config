@@ -41,9 +41,9 @@
   ];
 
   # Some from flatpak
-  services.flatpak.packages = [
-    "flathub:app/net.nokyan.Resources"
-  ];
+  # services.flatpak.packages = [
+  #   "flathub:app/net.nokyan.Resources"
+  # ];
 
   # Enable the GNOME extensions ootb
   programs.dconf.profiles.user.databases = [
