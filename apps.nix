@@ -43,6 +43,12 @@
     pkgs.docker-compose
   ]
 
+  # AI shi
+  # ++ [
+  #   pkgs.crush
+  #   pkgs.mcp-nixos
+  # ]
+
   # Misc CLI
   ++ [
     pkgs.wl-clipboard

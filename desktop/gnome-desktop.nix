@@ -24,7 +24,7 @@
   qt = {
     enable = true;
     platformTheme = "gnome";
-    style = "adwaita";
+    style = "breeze";
   };
 
   # Remove some stuff
