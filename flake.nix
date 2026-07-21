@@ -42,20 +42,24 @@
           inputs.nix-flatpak.nixosModules.nix-flatpak
 
           # System stuff
-          ./default.nix
-          ./disko.nix
-          ./lanzaboote.nix # <-- add ONLY after first successful boot, see steps below
-          ./zram.nix
-          ./tpm2.nix
-          ./hardware-configuration.nix
-          ./kargs.nix
-          ./users.nix
+          ./system/base.nix
+          ./system/disko.nix
+          ./system/lanzaboote.nix # <-- add ONLY after first successful boot, see steps below
+          ./system/zram.nix
+          ./system/tpm2.nix
+          ./system/hardware-configuration.nix
+          ./system/kargs.nix
+          ./system/users.nix
+
+          # Misc
+          ./misc/font-fix.nix
+          ./misc/lang-bangla.nix
+
+          # Desktop
+          ./desktop/kde-desktop.nix
 
           # Apps etc
-          ./kde-desktop.nix
-          ./lang-bangla.nix
           ./apps.nix
-          ./font-fix.nix
         ];
       };
     };
