@@ -41,10 +41,12 @@
     pkgs.distrobox
     pkgs.podman-compose
     pkgs.docker-compose
-  ];
+  ]
 
-  # MS Corefonts
-  fonts.packages = [ pkgs.corefonts ];
+  # Misc CLI
+  ++ [
+    pkgs.wl-clipboard
+  ];
 
   # Cloudflare WARP
   services.cloudflare-warp.enable = true;
@@ -69,7 +71,7 @@
     };
   };
 
-  # Flatpak
+  # Flatpak configuration
   services.flatpak = {
     enable = true;
     remotes = [
@@ -78,5 +80,8 @@
         location = "https://dl.flathub.org/repo/flathub.flatpakrepo";
       }
     ];
+
+    # Flatpak apps
+    packages = [ "flathub:app/org.gnome.World.PikaBackup" ];
   };
 }

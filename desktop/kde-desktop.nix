@@ -23,8 +23,6 @@
     };
   };
 
-  environment.systemPackages = [ pkgs.wl-clipboard ]; # for wl-copy to work
-
   # Fancy GUI SSH auth
   programs.ssh = {
     startAgent = true; # starts ssh-agent as a systemd user service

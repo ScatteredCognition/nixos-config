@@ -51,15 +51,16 @@
           ./system/kargs.nix
           ./system/users.nix
 
+          # Apps etc
+          ./apps.nix
+
+          # Desktop
+          #./desktop/kde-desktop.nix
+          ./desktop/gnome-desktop.nix
+
           # Misc
           ./misc/font-fix.nix
           ./misc/lang-bangla.nix
-
-          # Desktop
-          ./desktop/kde-desktop.nix
-
-          # Apps etc
-          ./apps.nix
         ];
       };
     };

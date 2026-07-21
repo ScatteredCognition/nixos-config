@@ -9,12 +9,13 @@
 5. Now the sacrifice disk has been thoroughly cleansed for the new soul to possess it  
   5.1. It is mounted under `/mnt`
 6. Run `sudo nixos-generate-config --root /mnt --no-filesystems`
-7. Run `cp /mnt/etc/nixos/hardware-configuration.nix ./hardware-configuration.nix`  
-  7.1. Run `rm ./hardware-configuration.nix` to remove any pre-existing hardware-specific config
-8. Comment out `flake.nix`:`./lanzaboot.nix` line  
+7. Run `cp /mnt/etc/nixos/hardware-configuration.nix ./system/hardware-configuration.nix`  
+  7.1. Run `rm ./system/hardware-configuration.nix` to remove any pre-existing hardware-specific config
+8. Comment out `flake.nix`:`./system/lanzaboot.nix` line  
   8.1. If you don't need or want SecureBoot, you can just keep it commented out  
-  8.2. Optionally, comment out `flake.nix`:`./lang-bangla.nix`,`./tpm2.nix` lines if you don't need the Bangla-specific stuff or TPM2 support  
-9. Finally, run `sudo nixos-install --flake .#myhost --no-root-password`
+  8.2. Optionally, comment out `flake.nix`:`./misc/lang-bangla.nix`,`./system/tpm2.nix` lines if you don't need the Bangla-specific stuff or TPM2 support  
+9. Comment/Uncomment the DEs you want to use such as `flake.nix`:`./desktop/gnome-desktop.nix` (You can keep multiple enabled to keep them installed)
+10. Finally, run `sudo nixos-install --flake .#myhost --no-root-password`
 
 ## Creating new deployments
 Run `sudo nixos-rebuild switch --flake

@@ -50,11 +50,23 @@
     enableDefaultPackages = true; # Default unicode fonts
     fontconfig.useEmbeddedBitmaps = true;
     fontDir.enable = true; # symlinks all host fonts to /run/current-system/sw/share/X11/fonts
+
+    packages = with pkgs; [
+      # MS Fonts
+      corefonts
+
+      # Install Noto fonts
+      noto-fonts
+      noto-fonts-color-emoji
+    ];
   };
 
   # Hardware stuff
   ## Power Management
   powerManagement.enable = true;
+
+  ## Enable firmware updater
+  services.fwupd.enable = true;
 
   ## Enable all firmwares incl. proprietary
   hardware.enableAllFirmware = true;
@@ -90,6 +102,7 @@
   environment.systemPackages = [
     pkgs.git
     pkgs.fastfetch
+    pkgs.tree
   ]
 
   # Needed for lanzaboot
