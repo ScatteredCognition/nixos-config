@@ -52,6 +52,7 @@
   programs.dconf.profiles.user.databases = [
     {
       settings = {
+        # gnome-shell stuff
         "org/gnome/shell" = {
           # Show logout button at all times
           always-show-log-out = true;
@@ -63,6 +64,31 @@
             alphabetical-app-grid.extensionUuid
             appindicator.extensionUuid
             caffeine.extensionUuid
+          ];
+        };
+
+        # App drawer stuff
+        "org/gnome/desktop/app-folders" = {
+          # No "Utilities" or "System app grouping"
+          folder-children =
+            [ ]
+            # LibreOffice group for apps
+            ++ [ "LibreOffice" ];
+        };
+
+        # Defines the properties of the new LibreOffice folder
+        "org/gnome/desktop/app-folders/folders/LibreOffice" = {
+          name = "LibreOffice";
+          translate = false;
+          # Groups all system-installed LibreOffice applications
+          apps = [
+            "libreoffice-startcenter.desktop"
+            "libreoffice-writer.desktop"
+            "libreoffice-calc.desktop"
+            "libreoffice-impress.desktop"
+            "libreoffice-draw.desktop"
+            "libreoffice-base.desktop"
+            "libreoffice-math.desktop"
           ];
         };
       };
