@@ -16,19 +16,22 @@
     pkgs.krita
     pkgs.kdePackages.kdenlive
     pkgs.blender
+    pkgs.naps2
+    pkgs.pika-backup
   ]
 
   # Conditional statement to install GTK/Qt variants depending on whether GNOME is installed
-  ++ [
-    (
-      if config.services.desktopManager.gnome.enable then
-        # Install if GNOME installed
+  ++ (
+    if config.services.desktopManager.gnome.enable then
+      # Install if GNOME installed
+      [
         pkgs.libreoffice-fresh
-      else
-        # Install if GNOME isn't installed
-        pkgs.libreoffice-qt6-fresh
-    )
-  ]
+      ]
+
+    else
+      # Install if GNOME isn't installed
+      [ pkgs.libreoffice-qt6-fresh ]
+  )
 
   # Nix LSP support
   ++ [

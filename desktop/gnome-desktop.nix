@@ -38,7 +38,10 @@
     pkgs.gnomeExtensions.alphabetical-app-grid
     pkgs.gnomeExtensions.appindicator
     pkgs.gnomeExtensions.caffeine
-  ];
+  ]
+
+  # Install Resources
+  ++ [ pkgs.resources ];
 
   # Some from flatpak
   # services.flatpak.packages = [
