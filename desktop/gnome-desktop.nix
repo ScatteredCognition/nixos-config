@@ -82,13 +82,13 @@
           translate = false;
           # Groups all system-installed LibreOffice applications
           apps = [
-            "libreoffice-startcenter.desktop"
-            "libreoffice-writer.desktop"
-            "libreoffice-calc.desktop"
-            "libreoffice-impress.desktop"
-            "libreoffice-draw.desktop"
-            "libreoffice-base.desktop"
-            "libreoffice-math.desktop"
+            "startcenter.desktop"
+            "writer.desktop"
+            "calc.desktop"
+            "impress.desktop"
+            "draw.desktop"
+            "base.desktop"
+            "math.desktop"
           ];
         };
       };
