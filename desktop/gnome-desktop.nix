@@ -40,8 +40,11 @@
     pkgs.gnomeExtensions.caffeine
   ]
 
-  # Install Resources
-  ++ [ pkgs.resources ];
+  # Install extra apps
+  ++ [
+    pkgs.resources
+    pkgs.refine
+  ];
 
   # Some from flatpak
   # services.flatpak.packages = [
@@ -69,8 +72,8 @@
 
         # App drawer stuff
         "org/gnome/desktop/app-folders" = {
-          # No "Utilities" or "System app grouping"
           folder-children =
+            # No "Utilities" or "System" app grouping, blank list
             [ ]
             # LibreOffice group for apps
             ++ [ "LibreOffice" ];

@@ -10,7 +10,10 @@
   environment.systemPackages = [
     # Basic apps
     inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
+    pkgs.tor-browser
+    pkgs.chromium
     pkgs.qbittorrent
+    pkgs.vlc
     # pkgs.onlyoffice-desktopeditors # Has issues finding fonts even after applying workarounds, use the flatpak
     pkgs.zed-editor
     pkgs.krita
