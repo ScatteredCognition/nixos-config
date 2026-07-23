@@ -21,11 +21,12 @@
   };
 
   # Configure Qt/GTK theming
-  qt = {
-    enable = true;
-    platformTheme = "gnome";
-    style = "breeze";
-  };
+  # BROKEN, doesn't work
+  # qt = {
+  #   enable = true;
+  #   platformTheme = "gnome";
+  #   style = "breeze";
+  # };
 
   # Remove some stuff
   environment.gnome.excludePackages = [
@@ -38,6 +39,17 @@
     pkgs.gnomeExtensions.alphabetical-app-grid
     pkgs.gnomeExtensions.appindicator
     pkgs.gnomeExtensions.caffeine
+  ]
+
+  # Needed for Qt app theming
+  # Got this info from NixOS Matrix
+  ++ [
+    # Fixes the titlebars
+    pkgs.qadwaitadecorations
+    pkgs.qadwaitadecorations-qt6
+    # Themes the app
+    pkgs.qgnomeplatform
+    pkgs.qgnomeplatform-qt6
   ]
 
   # Install extra apps
