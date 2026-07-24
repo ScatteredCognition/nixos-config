@@ -59,7 +59,7 @@
           # System stuff
           ./system/base.nix
           ./system/disko.nix
-          ./system/lanzaboote.nix # <-- add ONLY after first successful boot, see steps below
+          ./system/lanzaboote.nix # <-- add ONLY after first successful boot
           ./system/zram.nix
           ./system/tpm2.nix
           ./system/hardware-configuration.nix
