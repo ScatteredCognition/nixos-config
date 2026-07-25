@@ -33,7 +33,7 @@
     pkgs.gnomeExtensions.caffeine
   ]
 
-  # Grab Gst plugins
+  # Grab Gst plugins (must be babysitted after each major upgrade)
   ++ (with pkgs.gst_all_1; [
     gstreamer
     gst-plugins-base
@@ -45,16 +45,19 @@
     gst-plugins-rs
   ])
 
-  # Thumbnailing support
+  # Thumbnailing support (must be babysitted after each major upgrade)
   ++ [
     # Video thumbnailers
     pkgs.gst-thumbnailers
 
     # Image thumbnailers
+    # gdj-pixbuf (old shi)
     pkgs.gdk-pixbuf
     pkgs.webp-pixbuf-loader
+    # glycin (new shi)
     pkgs.libglycin
     pkgs.glycin-loaders
+    # For heic/avif/jxl support
     pkgs.libheif
     pkgs.libjxl
     pkgs.libavif
