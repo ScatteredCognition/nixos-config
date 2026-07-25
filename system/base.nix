@@ -68,9 +68,6 @@
   ## Enable firmware updater
   services.fwupd.enable = true;
 
-  ## Enable all firmwares incl. proprietary
-  hardware.enableAllFirmware = true;
-
   ## Bluetooth stuff
   hardware.bluetooth = {
     enable = true;
