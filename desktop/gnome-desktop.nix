@@ -20,14 +20,6 @@
     type = "ibus";
   };
 
-  # Configure Qt/GTK theming
-  # BROKEN, doesn't work
-  # qt = {
-  #   enable = true;
-  #   platformTheme = "gnome";
-  #   style = "breeze";
-  # };
-
   # Remove some stuff
   environment.gnome.excludePackages = [
     pkgs.epiphany
@@ -39,6 +31,42 @@
     pkgs.gnomeExtensions.alphabetical-app-grid
     pkgs.gnomeExtensions.appindicator
     pkgs.gnomeExtensions.caffeine
+  ]
+
+  # Grab Gst plugins
+  ++ (with pkgs.gst_all_1; [
+    gstreamer
+    gst-plugins-base
+    gst-plugins-good
+    gst-plugins-bad
+    gst-plugins-ugly
+    gst-libav
+    gst-vaapi
+    gst-plugins-rs
+  ])
+
+  # Thumbnailing support
+  ++ [
+    # Video thumbnailers
+    pkgs.gst-thumbnailers
+
+    # Image thumbnailers
+    # pkgs.gdk-pixbuf
+    # pkgs.webp-pixbuf-loader
+    pkgs.libglycin
+    pkgs.glycin-loaders
+    pkgs.libheif
+    pkgs.libjxl
+    pkgs.libavif
+
+    # Exe thumbnailers
+    pkgs.icoextract
+
+    # Epub/Mobi thumbnailers
+    pkgs.gnome-epub-thumbnailer
+
+    # Krita/ORA thumbnails
+    pkgs.gnome-kra-ora-thumbnailer
   ]
 
   # Needed for Qt app theming
@@ -58,10 +86,10 @@
     pkgs.refine
   ];
 
-  # Some from flatpak
-  # services.flatpak.packages = [
-  #   "flathub:app/net.nokyan.Resources"
-  # ];
+  # workaround for NixOS not setting GST PATH variable
+  environment.sessionVariables = {
+    GST_PLUGIN_PATH = "/run/current-system/sw/lib/gstreamer-1.0/";
+  };
 
   # Enable the GNOME extensions ootb
   programs.dconf.profiles.user.databases = [

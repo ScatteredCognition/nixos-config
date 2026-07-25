@@ -57,6 +57,9 @@
 
   # Misc CLI
   ++ [
+    pkgs.ffmpeg-headless
+    pkgs.aria2
+    pkgs.yt-dlp
     pkgs.wl-clipboard
   ];
 
