@@ -52,6 +52,7 @@
   # Wine
   ++ [
     pkgs.wineWow64Packages.stagingFull
+    pkgs.winetricks
   ]
 
   # AI shi
