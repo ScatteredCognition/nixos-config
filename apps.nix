@@ -49,6 +49,11 @@
     pkgs.docker-compose
   ]
 
+  # Wine
+  ++ [
+    pkgs.wineWow64Packages.stagingFull
+  ]
+
   # AI shi
   # ++ [
   #   pkgs.crush
