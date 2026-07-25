@@ -51,8 +51,8 @@
     pkgs.gst-thumbnailers
 
     # Image thumbnailers
-    # pkgs.gdk-pixbuf
-    # pkgs.webp-pixbuf-loader
+    pkgs.gdk-pixbuf
+    pkgs.webp-pixbuf-loader
     pkgs.libglycin
     pkgs.glycin-loaders
     pkgs.libheif
