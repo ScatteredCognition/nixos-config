@@ -50,10 +50,10 @@
   ]
 
   # Wine
-  ++ [
-    pkgs.wineWow64Packages.stagingFull
-    pkgs.winetricks
-  ]
+  # ++ [
+  #   pkgs.wineWow64Packages.stagingFull
+  #   pkgs.winetricks
+  # ]
 
   # AI shi
   # ++ [
