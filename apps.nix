@@ -9,7 +9,6 @@
 {
   environment.systemPackages = [
     # Basic apps
-    pkgs.home-manager
     inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
     pkgs.tor-browser
     pkgs.chromium
