@@ -56,7 +56,7 @@
         ./system/users.nix
 
         # HW-specific stuff
-        ./system/hardware-configuration.nix
+        ./hw/hardware-configuration.nix
         # ./misc/hw/dell-latitude-3530.nix
 
         # Apps etc
@@ -73,7 +73,7 @@
     in
     {
       nixosConfigurations.base-desktop = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
+        system = nixpkgs.hostPlatform;
         # Every child module gets access to the inputs defined (needed for Zen browser in apps.nix)
         specialArgs = { inherit inputs; };
         modules = base-desktop ++ [
@@ -82,11 +82,11 @@
       };
 
       nixosConfigurations.dell-nixos = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
+        system = nixpkgs.hostPlatform;
         # Every child module gets access to the inputs defined (needed for Zen browser in apps.nix)
         specialArgs = { inherit inputs; };
         modules = base-desktop ++ [
-          ./misc/hw/dell-latitude-3530.nix
+          ./hw/dell-latitude-3530.nix
         ];
       };
     };

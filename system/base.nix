@@ -1,5 +1,10 @@
 # default.nix
-{ pkgs, config, ... }:
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
 
 {
   # NixOS Version + allow unfree
@@ -30,7 +35,7 @@
 
   # Networking
   networking = {
-    hostName = config.system.nixos.distroId; # set this in ./misc/hw/<hardware_name>.nix
+    hostName = lib.mkDefault config.system.nixos.distroId; # set this in ./misc/hw/<hardware_name>.nix
     networkmanager.enable = true;
     firewall.enable = false; # Disable firewall coz too many issues
 
