@@ -62,6 +62,11 @@
   ## Enable firmware updater
   services.fwupd.enable = true;
 
+  ## Filesystem maintenance
+  services.btrfs.autoScrub = {
+    enable = true;
+  };
+
   # fish + zsh
   programs = {
     fish.enable = true;

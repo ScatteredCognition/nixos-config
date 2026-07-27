@@ -44,18 +44,23 @@
 
     # Define modules
     let
+      # mkSystem
+      mkSystem =
+        modules:
+        nixpkgs.lib.nixosSystem {
+          specialArgs = { inherit inputs; };
+          modules = modules;
+        };
 
       # base
-      base = [
+      baseModule = [
         # inputs modules
         inputs.disko.nixosModules.disko
-        inputs.lanzaboote.nixosModules.lanzaboote
         inputs.nix-flatpak.nixosModules.nix-flatpak
 
         # System stuff
         ./system/base.nix
         ./system/disko.nix
-        ./system/lanzaboote.nix
         ./system/zram.nix
         ./system/tpm2.nix
         ./system/users.nix
@@ -66,7 +71,7 @@
       ];
 
       # base-desktop
-      base-desktop = base ++ [
+      desktopModule = [
         # base-desktop core
         ./system/base-desktop.nix
 
@@ -82,57 +87,27 @@
         ./misc/lang-bangla.nix
       ];
 
+      # lanzaboote
+      lanzabooteModule = [
+        inputs.lanzaboote.nixosModules.lanzaboote
+        ./system/lanzaboote.nix
+      ];
+
     in
     {
-      # base
-      nixosConfigurations.base = nixpkgs.lib.nixosSystem {
-        # system = nixpkgs.hostPlatform;
-        # Every child module gets access to the inputs defined (needed for Zen browser in apps.nix)
-        specialArgs = { inherit inputs; };
-        modules = base ++ [
-          # Empty on purpose
-        ];
-      };
+      nixosConfigurations = {
+        # Install configs
+        base-install = mkSystem baseModule;
+        base-desktop-install = mkSystem (baseModule ++ desktopModule);
 
-      # base-desktop
-      nixosConfigurations.base-desktop = nixpkgs.lib.nixosSystem {
-        # system = nixpkgs.hostPlatform;
-        # Every child module gets access to the inputs defined (needed for Zen browser in apps.nix)
-        specialArgs = { inherit inputs; };
-        modules = base-desktop ++ [
-          # Empty on purpose
-        ];
-      };
+        # Base configs
+        base = mkSystem (baseModule ++ lanzabooteModule);
+        base-desktop = mkSystem (baseModule ++ desktopModule ++ lanzabooteModule);
 
-      # base-install
-      nixosConfigurations.base-install = nixpkgs.lib.nixosSystem {
-        # system = nixpkgs.hostPlatform;
-        # Every child module gets access to the inputs defined (needed for Zen browser in apps.nix)
-        specialArgs = { inherit inputs; };
-        modules = (nixpkgs.lib.remove ./system/lanzaboote.nix base-desktop) ++ [
-          # Empty on purpose
-        ];
-      };
-
-      # base-desktop-install
-      # Run `sudo sbctl create-keys` and `sudo sbctl enroll-keys -m` before using this module
-      nixosConfigurations.base-desktop-install = nixpkgs.lib.nixosSystem {
-        # system = nixpkgs.hostPlatform;
-        # Every child module gets access to the inputs defined (needed for Zen browser in apps.nix)
-        specialArgs = { inherit inputs; };
-        modules = (nixpkgs.lib.remove ./system/lanzaboote.nix base-desktop) ++ [
-          # Empty on purpose
-        ];
-      };
-
-      # For dell-latitude-3530
-      nixosConfigurations.dell-l3530-nixos = nixpkgs.lib.nixosSystem {
-        # system = nixpkgs.hostPlatform;
-        # Every child module gets access to the inputs defined (needed for Zen browser in apps.nix)
-        specialArgs = { inherit inputs; };
-        modules = base-desktop ++ [
-          ./hw/dell-latitude-3530.nix
-        ];
+        # Device-specific configs
+        dell-l3530-nixos = mkSystem (
+          baseModule ++ desktopModule ++ lanzabooteModule ++ [ ./hw/dell-latitude-3530.nix ]
+        );
       };
     };
 }
