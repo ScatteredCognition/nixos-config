@@ -10,10 +10,15 @@
   # NixOS Version + allow unfree
   system.stateVersion = "26.05";
   nixpkgs.config.allowUnfree = true;
-  nix.settings.experimental-features = [
-    "nix-command"
-    "flakes"
-  ];
+  nix.settings = {
+    trusted-users = [
+      "@wheel"
+    ];
+    experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
+  };
 
   # Boot stuff
   boot = {
