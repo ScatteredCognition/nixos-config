@@ -52,8 +52,9 @@
           modules = modules;
         };
 
-      # removeModule
-      removeModule = mod: mods: builtins.filter (m: m != mod) mods;
+      # for subtracting lists and converting modules to lists
+      subtractLists = nixpkgs.lib.lists.subtractLists;
+      toList = nixpkgs.lib.lists.toList;
 
       # lanzaboote
       # So removeModule isn't dependant on a hardcoded path
@@ -99,8 +100,10 @@
     {
       nixosConfigurations = {
         # Install configs
-        base-install = mkSystem (removeModule lanzabooteModule baseModule);
-        base-desktop-install = mkSystem (removeModule lanzabooteModule (baseModule ++ desktopModule));
+        base-install = mkSystem (subtractLists (toList lanzabooteModule) (toList baseModule));
+        base-desktop-install = mkSystem (
+          subtractLists (toList lanzabooteModule) (toList (baseModule ++ desktopModule))
+        );
 
         # Base configs
         base = mkSystem baseModule;
