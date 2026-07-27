@@ -55,8 +55,12 @@
       # removeModule
       removeModule = mod: mods: builtins.filter (m: m != mod) mods;
 
+      # lanzaboote
+      # So removeModule isn't dependant on a hardcoded path
+      lanzabooteModule = [ ./system/lanzaboote.nix ];
+
       # base
-      baseModule = [
+      baseModule = lanzabooteModule ++ [
         # inputs modules
         inputs.disko.nixosModules.disko
         inputs.lanzaboote.nixosModules.lanzaboote
@@ -65,7 +69,6 @@
         # System stuff
         ./system/base.nix
         ./system/disko.nix
-        ./system/lanzaboote.nix
         ./system/zram.nix
         ./system/tpm2.nix
         ./system/users.nix
@@ -96,10 +99,8 @@
     {
       nixosConfigurations = {
         # Install configs
-        base-install = mkSystem (removeModule ./system/lanzaboote.nix baseModule);
-        base-desktop-install = mkSystem (
-          removeModule ./system/lanzaboote.nix (baseModule ++ desktopModule)
-        );
+        base-install = mkSystem (removeModule lanzabooteModule baseModule);
+        base-desktop-install = mkSystem (removeModule lanzabooteModule (baseModule ++ desktopModule));
 
         # Base configs
         base = mkSystem baseModule;
