@@ -1,5 +1,5 @@
 # default.nix
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 
 {
   # NixOS Version + allow unfree
@@ -30,7 +30,7 @@
 
   # Networking
   networking = {
-    hostName = "dell-nixos";
+    hostName = config.system.nixos.distroId; # set this in ./misc/hw/<hardware_name>.nix
     networkmanager.enable = true;
     firewall.enable = false; # Disable firewall coz too many issues
 

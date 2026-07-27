@@ -1,6 +1,9 @@
 # kargs.nix
 
 {
+  # Set hostname
+  networking.hostName = "dell-nixos";
+
   # Disable mitigations
   boot.kernelParams = [
     "mitigations=off"

@@ -38,37 +38,55 @@
       zen-browser,
       ...
     }@inputs: # destructures the previous variables into individual keys
+
+    # Define modules
+    let
+      base-desktop = [
+        # inputs modules
+        inputs.disko.nixosModules.disko
+        inputs.lanzaboote.nixosModules.lanzaboote
+        inputs.nix-flatpak.nixosModules.nix-flatpak
+
+        # System stuff
+        ./system/base.nix
+        ./system/disko.nix
+        ./system/lanzaboote.nix # <-- add ONLY after first successful boot
+        ./system/zram.nix
+        ./system/tpm2.nix
+        ./system/users.nix
+
+        # HW-specific stuff
+        ./system/hardware-configuration.nix
+        # ./misc/hw/dell-latitude-3530.nix
+
+        # Apps etc
+        ./apps.nix
+
+        # Desktop
+        #./desktop/kde-desktop.nix
+        ./desktop/gnome-desktop.nix
+
+        # Misc
+        ./misc/font-fix.nix
+        ./misc/lang-bangla.nix
+      ];
+    in
     {
-      nixosConfigurations.myhost = nixpkgs.lib.nixosSystem {
+      nixosConfigurations.base-desktop = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         # Every child module gets access to the inputs defined (needed for Zen browser in apps.nix)
         specialArgs = { inherit inputs; };
-        modules = [
-          # inputs modules
-          inputs.disko.nixosModules.disko
-          inputs.lanzaboote.nixosModules.lanzaboote
-          inputs.nix-flatpak.nixosModules.nix-flatpak
+        modules = base-desktop ++ [
+          # Empty on purpose
+        ];
+      };
 
-          # System stuff
-          ./system/base.nix
-          ./system/disko.nix
-          ./system/lanzaboote.nix # <-- add ONLY after first successful boot
-          ./system/zram.nix
-          ./system/tpm2.nix
-          ./system/hardware-configuration.nix
-          ./system/kargs.nix
-          ./system/users.nix
-
-          # Apps etc
-          ./apps.nix
-
-          # Desktop
-          #./desktop/kde-desktop.nix
-          ./desktop/gnome-desktop.nix
-
-          # Misc
-          ./misc/font-fix.nix
-          ./misc/lang-bangla.nix
+      nixosConfigurations.dell-nixos = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        # Every child module gets access to the inputs defined (needed for Zen browser in apps.nix)
+        specialArgs = { inherit inputs; };
+        modules = base-desktop ++ [
+          ./misc/hw/dell-latitude-3530.nix
         ];
       };
     };
