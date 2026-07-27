@@ -10,7 +10,7 @@
   environment.systemPackages = [
     # Basic apps
     inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
-    pkgs.firefox # backup if zen breaks
+    # pkgs.firefox # backup if zen breaks
     pkgs.chromium
     pkgs.tor-browser
     pkgs.qbittorrent
