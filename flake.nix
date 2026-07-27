@@ -1,7 +1,10 @@
 # flake.nix
 
-# Inputs
 {
+  # Description
+  description = "ScatteredCognition's NixOS flake";
+
+  # Inputs
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
 
