@@ -3,12 +3,22 @@
 { pkgs, ... }:
 
 {
-  users.users.faeizmahrus = {
-    isNormalUser = true;
-    extraGroups = [ "wheel" ];
-    hashedPassword = "";
-    # packages = with pkgs; [ ];
+  users.users = {
+    faeizmahrus = {
+      isNormalUser = true;
+      extraGroups = [ "wheel" ];
+      hashedPassword = "";
 
-    shell = pkgs.fish;
+      # User shell
+      shell = pkgs.fish;
+    };
+
+    guest = {
+      isNormalUser = true;
+      hashedPassword = "";
+
+      # User shell
+      shell = pkgs.zsh;
+    };
   };
 }
