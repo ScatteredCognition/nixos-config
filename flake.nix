@@ -52,15 +52,20 @@
           modules = modules;
         };
 
+      # removeModule
+      removeModule = mod: mods: builtins.filter (m: m != mod) mods;
+
       # base
       baseModule = [
         # inputs modules
         inputs.disko.nixosModules.disko
+        inputs.lanzaboote.nixosModules.lanzaboote
         inputs.nix-flatpak.nixosModules.nix-flatpak
 
         # System stuff
         ./system/base.nix
         ./system/disko.nix
+        ./system/lanzaboote.nix
         ./system/zram.nix
         ./system/tpm2.nix
         ./system/users.nix
@@ -87,27 +92,21 @@
         ./misc/lang-bangla.nix
       ];
 
-      # lanzaboote
-      lanzabooteModule = [
-        inputs.lanzaboote.nixosModules.lanzaboote
-        ./system/lanzaboote.nix
-      ];
-
     in
     {
       nixosConfigurations = {
         # Install configs
-        base-install = mkSystem baseModule;
-        base-desktop-install = mkSystem (baseModule ++ desktopModule);
+        base-install = mkSystem (removeModule ./system/lanzaboote.nix baseModule);
+        base-desktop-install = mkSystem (
+          removeModule ./system/lanzaboote.nix (baseModule ++ desktopModule)
+        );
 
         # Base configs
-        base = mkSystem (baseModule ++ lanzabooteModule);
-        base-desktop = mkSystem (baseModule ++ desktopModule ++ lanzabooteModule);
+        base = mkSystem baseModule;
+        base-desktop = mkSystem (baseModule ++ desktopModule);
 
         # Device-specific configs
-        dell-l3530-nixos = mkSystem (
-          baseModule ++ desktopModule ++ lanzabooteModule ++ [ ./hw/dell-latitude-3530.nix ]
-        );
+        dell-l3530-nixos = mkSystem (baseModule ++ desktopModule ++ [ ./hw/dell-latitude-3530.nix ]);
       };
     };
 }
