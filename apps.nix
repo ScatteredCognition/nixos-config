@@ -51,20 +51,17 @@
   ]
 
   # AI shi
-  ++ [
-    pkgs.crush
-    pkgs.mcp-nixos
-    pkgs.mcp-server-filesystem
-    pkgs.mcp-server-git
-    pkgs.mcp-server-sequential-thinking
-    pkgs.mcp-server-fetch
-  ]
+  # ++ [
+  #   pkgs.crush
+  #   pkgs.mcp-nixos
+  #   pkgs.mcp-server-filesystem
+  #   pkgs.mcp-server-git
+  #   pkgs.mcp-server-sequential-thinking
+  #   pkgs.mcp-server-fetch
+  # ]
 
   # Misc CLI
   ++ [
-    pkgs.ffmpeg-headless
-    pkgs.aria2
-    pkgs.yt-dlp
     pkgs.wl-clipboard
   ];
 

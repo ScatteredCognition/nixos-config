@@ -49,6 +49,8 @@
   ++ [
     # Video thumbnailers
     pkgs.gst-thumbnailers
+    pkgs.ffmpeg-headless
+    pkgs.ffmpegthumbnailer
 
     # Image thumbnailers
     # gdj-pixbuf (old shi)
