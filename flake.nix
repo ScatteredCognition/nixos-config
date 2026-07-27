@@ -17,12 +17,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # home-manager
-    home-manager = {
-      url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     # nix-flatpak
     nix-flatpak = {
       url = "github:gmodena/nix-flatpak";
@@ -53,7 +47,6 @@
           # inputs modules
           inputs.disko.nixosModules.disko
           inputs.lanzaboote.nixosModules.lanzaboote
-          inputs.home-manager.nixosModules.home-manager
           inputs.nix-flatpak.nixosModules.nix-flatpak
 
           # System stuff
