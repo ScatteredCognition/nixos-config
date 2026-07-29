@@ -72,39 +72,33 @@
         bn_BD = [ ./misc/lang/bn_BD.nix ];
       };
 
-      # base
-      baseModule = [
-        # inputs modules
+      # Inputs module
+      inputsModule = [
         inputs.disko.nixosModules.disko
         inputs.lanzaboote.nixosModules.lanzaboote
         inputs.nix-flatpak.nixosModules.nix-flatpak
+      ];
 
-        # System stuff
-        ./system/base.nix
-        ./system/disko.nix
-        ./system/zram.nix
-        ./system/tpm2.nix
-        ./system/users.nix
-      ]
-      # Include Lanzaboote
-      ++ lanzabooteModule
-      # HW config
-      ++ hwModule.hardwareConfiguration
-      # Languages
-      ++ langModule.bn_BD;
+      # base
+      baseModule =
+        (lanzabooteModule ++ hwModule.hardwareConfiguration) # Include Lanzaboote and hwconf
+        ++ inputsModule # Include flake inputs
+        ++ [
+          # System stuff
+          ./system/base.nix
+          ./system/disko.nix
+          ./system/zram.nix
+          ./system/tpm2.nix
+          ./system/users.nix
+        ];
 
       # base-desktop
       desktopModule =
         let
           commonDesktopModules = [
-            # base-desktop core
-            ./system/base-desktop.nix
-
-            # Apps etc
-            ./apps.nix
-
-            # Misc
-            ./misc/font-fix.nix
+            ./system/base-desktop.nix # base-desktop core
+            ./apps.nix # Apps etc
+            ./misc/font-fix.nix # Misc
           ];
         in
         rec {
@@ -117,27 +111,40 @@
     {
       nixosConfigurations =
         let
+          # base without any DE/GUI
+          base = {
+            # Install config
+            Install = (
+              (subtractLists lanzabooteModule baseModule) # base module minus lanzaboote
+              # Add language support here
+              ++ langModule.bn_BD
+            );
 
-          # Install configs
-          baseInstall = (subtractLists lanzabooteModule baseModule);
-          baseDesktopInstall = (baseInstall ++ desktopModule.default);
+            # System config w/ lanzaboote
+            System = (
+              baseModule # base module
+              # Add language support here
+              ++ langModule.bn_BD
+            );
+          };
 
-          # Base configs
-          baseSystem = baseModule;
-          baseDesktopSystem = baseSystem ++ desktopModule.default;
+          baseDesktop = {
+            Install = base.Install ++ desktopModule.default;
+            System = base.System ++ desktopModule.default;
+          };
 
         in
         {
           # Install configs
-          base-install = mkSystem baseInstall;
-          base-desktop-install = mkSystem baseDesktopInstall;
+          base-install = mkSystem base.Install;
+          base-desktop-install = mkSystem baseDesktop.Install;
 
           # Base configs
-          base = mkSystem baseSystem;
-          base-desktop = mkSystem baseDesktopSystem;
+          base = mkSystem base.System;
+          base-desktop = mkSystem baseDesktop.System;
 
           # Device-specific configs
-          dell-l3530-nixos = mkSystem (baseDesktopSystem ++ hwModule.dell-l3530);
+          dell-l3530-nixos = mkSystem (baseDesktop.System ++ hwModule.dell-l3530);
         };
     };
 }
