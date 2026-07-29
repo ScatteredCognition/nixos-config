@@ -62,13 +62,18 @@
 
       # hardware-specific stuff
       hwModule = {
-        hardwareConfiguration = "./hw/hardware-configuration.nix";
-        dell-l3530 = "./hw/dell-l3530.nix";
+        hardwareConfiguration = [ ./hw/hardware-configuration.nix ];
+        dell-l3530 = [ ./hw/dell-l3530.nix ];
         # add other hw stuff here
       };
 
+      # Language stuff
+      langModule = {
+        bn-BD = [ ./misc/lang-bn_BD.nix ];
+      };
+
       # base
-      baseModule = lanzabooteModule ++ [
+      baseModule = [
         # inputs modules
         inputs.disko.nixosModules.disko
         inputs.lanzaboote.nixosModules.lanzaboote
@@ -80,42 +85,59 @@
         ./system/zram.nix
         ./system/tpm2.nix
         ./system/users.nix
-
-        # HW-specific stuff
-        hwModule.hardwareConfiguration
-        # ./misc/hw/dell-latitude-3530.nix
-      ];
+      ]
+      # Include Lanzaboote
+      ++ lanzabooteModule
+      # HW config
+      ++ hwModule.hardwareConfiguration
+      # Languages
+      ++ langModule.bn-BD;
 
       # base-desktop
-      desktopModule = [
-        # base-desktop core
-        ./system/base-desktop.nix
+      desktopModule =
+        let
+          commonDesktopModules = [
+            # base-desktop core
+            ./system/base-desktop.nix
 
-        # Apps etc
-        ./apps.nix
+            # Apps etc
+            ./apps.nix
 
-        # Desktop
-        #./desktop/kde-desktop.nix
-        ./desktop/gnome-desktop.nix
-
-        # Misc
-        ./misc/font-fix.nix
-        ./misc/lang-bangla.nix
-      ];
+            # Misc
+            ./misc/font-fix.nix
+          ];
+        in
+        rec {
+          default = gnome-desktop;
+          gnome-desktop = commonDesktopModules ++ [ ./desktop/gnome-desktop.nix ];
+          kde-desktop = commonDesktopModules ++ [ ./desktop/kde-desktop.nix ];
+        };
 
     in
     {
-      nixosConfigurations = {
-        # Install configs
-        base-install = mkSystem (subtractLists lanzabooteModule baseModule);
-        base-desktop-install = mkSystem (subtractLists lanzabooteModule (baseModule ++ desktopModule));
+      nixosConfigurations =
+        let
 
-        # Base configs
-        base = mkSystem baseModule;
-        base-desktop = mkSystem (baseModule ++ desktopModule);
+          # Install configs
+          baseInstall = (subtractLists lanzabooteModule baseModule);
+          baseDesktopInstall = (baseInstall ++ desktopModule.default);
 
-        # Device-specific configs
-        dell-l3530-nixos = mkSystem (baseModule ++ desktopModule ++ hwModule.dell-l3530);
-      };
+          # Base configs
+          baseSystem = baseModule;
+          baseDesktopSystem = baseSystem ++ desktopModule.default;
+
+        in
+        {
+          # Install configs
+          base-install = mkSystem baseInstall;
+          base-desktop-install = mkSystem baseDesktopInstall;
+
+          # Base configs
+          base = mkSystem baseSystem;
+          base-desktop = mkSystem baseDesktopSystem;
+
+          # Device-specific configs
+          dell-l3530-nixos = mkSystem (baseDesktopSystem ++ hwModule.dell-l3530);
+        };
     };
 }
