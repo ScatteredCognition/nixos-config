@@ -115,6 +115,17 @@
           ];
         };
 
+        # Default settings for extensions
+        "org/gnome/shell/extensions/alphabetical-app-grid" = {
+          folder-order-position = "start";
+          sort-folder-contents = true;
+        };
+
+        "org/gnome/shell/extensions/appindicator" = {
+          icon-opacity = 255;
+          icon-saturation = 1.0;
+        };
+
         # App drawer stuff
         "org/gnome/desktop/app-folders" = {
           folder-children =
