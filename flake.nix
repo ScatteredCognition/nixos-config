@@ -69,7 +69,7 @@
 
       # Language stuff
       langModule = {
-        bn-BD = [ ./misc/lang-bn_BD.nix ];
+        bn_BD = [ ./misc/lang/bn_BD.nix ];
       };
 
       # base
@@ -91,7 +91,7 @@
       # HW config
       ++ hwModule.hardwareConfiguration
       # Languages
-      ++ langModule.bn-BD;
+      ++ langModule.bn_BD;
 
       # base-desktop
       desktopModule =
