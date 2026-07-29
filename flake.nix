@@ -60,6 +60,13 @@
       # So removeModule isn't dependant on a hardcoded path
       lanzabooteModule = [ ./system/lanzaboote.nix ];
 
+      # hardware-specific stuff
+      hwModule = {
+        hardwareConfiguration = "./hw/hardware-configuration.nix";
+        dell-l3530 = "./hw/dell-l3530.nix";
+        # add other hw stuff here
+      };
+
       # base
       baseModule = lanzabooteModule ++ [
         # inputs modules
@@ -75,7 +82,7 @@
         ./system/users.nix
 
         # HW-specific stuff
-        ./hw/hardware-configuration.nix
+        hwModule.hardwareConfiguration
         # ./misc/hw/dell-latitude-3530.nix
       ];
 
@@ -108,7 +115,7 @@
         base-desktop = mkSystem (baseModule ++ desktopModule);
 
         # Device-specific configs
-        dell-l3530-nixos = mkSystem (baseModule ++ desktopModule ++ [ ./hw/dell-latitude-3530.nix ]);
+        dell-l3530-nixos = mkSystem (baseModule ++ desktopModule ++ hwModule.dell-l3530);
       };
     };
 }

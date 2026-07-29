@@ -1,4 +1,4 @@
-# kargs.nix
+# dell-l3530
 
 {
   # Set hostname
