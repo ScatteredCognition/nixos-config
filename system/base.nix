@@ -3,6 +3,7 @@
   pkgs,
   config,
   lib,
+  inputs,
   ...
 }:
 
@@ -10,7 +11,9 @@
   # NixOS Version + allow unfree
   system.stateVersion = "26.05";
   nixpkgs.config.allowUnfree = true;
+  nix.registry.nixpkgs.flake = inputs.nixpkgs; # explicitly set nixpkgs to system nixpkgs
   nix.settings = {
+    auto-optimise-store = true;
     trusted-users = [
       "@wheel"
     ];
@@ -82,7 +85,6 @@
   environment.systemPackages = [
     pkgs.git
     pkgs.fastfetch
-    pkgs.tree
     pkgs.home-manager
   ]
 
