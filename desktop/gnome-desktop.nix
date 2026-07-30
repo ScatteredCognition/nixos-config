@@ -122,7 +122,7 @@
         };
 
         "org/gnome/shell/extensions/appindicator" = {
-          icon-opacity = 255;
+          icon-opacity = 255.0;
           icon-saturation = 1.0;
         };
 

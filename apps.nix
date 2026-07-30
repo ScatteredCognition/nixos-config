@@ -50,6 +50,12 @@
     pkgs.docker-compose
   ]
 
+  # Wine
+  ++ [
+    pkgs.wineWow64Packages.staging
+    pkgs.winetricks
+  ]
+
   # AI shi
   # ++ [
   #   pkgs.crush
@@ -76,16 +82,22 @@
 
   # Podman
   virtualisation = {
+    # OCI-container support
     containers = {
       enable = true;
       registries.search = [ "docker.io" ];
     };
+
+    # podman
     podman = {
       enable = true;
       dockerCompat = true;
       # Required for containers under podman-compose to be able to talk to each other.
       defaultNetwork.settings.dns_enabled = true;
     };
+
+    # vmware
+    vmware.host.enable = true;
   };
 
   # Flatpak configuration
