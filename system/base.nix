@@ -75,6 +75,9 @@
     enable = true;
   };
 
+  ## Clean /tmp on boot
+  boot.tmp.cleanOnBoot = true;
+
   # fish + zsh
   programs = {
     fish.enable = true;
