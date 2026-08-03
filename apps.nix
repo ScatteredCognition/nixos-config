@@ -18,6 +18,7 @@
     # pkgs.onlyoffice-desktopeditors # Has issues finding fonts even after applying workarounds, use the flatpak
     pkgs.zed-editor
     pkgs.krita
+    pkgs.gimp-with-plugins
     pkgs.kdePackages.kdenlive
     pkgs.blender
     pkgs.naps2
