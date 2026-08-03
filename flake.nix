@@ -90,6 +90,9 @@
           ./system/zram.nix
           ./system/tpm2.nix
           ./system/users.nix
+
+          # dirty cache writeback fix
+          ./misc/disk-writeback-fix.nix
         ];
 
       # base-desktop
