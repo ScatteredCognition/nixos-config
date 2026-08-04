@@ -101,7 +101,7 @@
           commonDesktopModules = [
             ./system/base-desktop.nix # base-desktop core
             ./apps.nix # Apps etc
-            ./misc/font-fix.nix # Misc
+            ./misc/usr-fix.nix # Misc
           ];
         in
         rec {
