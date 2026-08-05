@@ -80,12 +80,14 @@
 
   ## Enable systemd-oomd
   systemd.oomd = {
-    enable = true; # already default since 24.05
-    enableRootSlice = true; # monitor -.slice
-    enableSystemSlice = true; # monitor system.slice
-    enableUserSlices = true; # monitor user sessions
+    enable = true;
+    # Monitor root/system/user slice
+    enableRootSlice = true;
+    enableSystemSlice = true;
+    enableUserSlices = true;
     settings.OOM = {
-      DefaultMemoryPressureDurationSec = "5s";
+      # DefaultMemoryPressureLimit = "60%";
+      DefaultMemoryPressureDurationSec = "1s"; # Works surprisingly well with minimal issues
     };
   };
 
