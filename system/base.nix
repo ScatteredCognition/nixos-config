@@ -78,6 +78,20 @@
   ## Clean /tmp on boot
   boot.tmp.cleanOnBoot = true;
 
+  ## Enable systemd-oomd
+  systemd.oomd = {
+    enable = true; # already default since 24.05
+    enableRootSlice = true; # monitor -.slice
+    enableSystemSlice = true; # monitor system.slice
+    enableUserSlices = true; # monitor user sessions
+    settings.OOM = {
+      DefaultMemoryPressureDurationSec = "5s";
+    };
+  };
+
+  ### Exceptions
+  systemd.services.sshd.serviceConfig.ManagedOOMPreference = "avoid";
+
   # fish + zsh
   programs = {
     fish.enable = true;
