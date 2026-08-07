@@ -63,12 +63,6 @@
     ];
   };
 
-  # Hardware stuff
-  ## Power Management
-  ### Already auto enabled
-  # https://github.com/NixOS/nixpkgs/blob/4fa4fdfc61c7a026bda9bb5de3f579114028e008/nixos/modules/config/power-management.nix#L18-L19
-  # powerManagement.enable = true;
-
   ## Enable firmware updater
   services.fwupd.enable = true;
 
@@ -80,21 +74,14 @@
   ## Clean /tmp on boot
   boot.tmp.cleanOnBoot = true;
 
-  ## Enable systemd-oomd
-  systemd.oomd = {
+  ## Enable earlyoom
+  services.earlyoom = {
     enable = true;
-    # Monitor root/system/user slice
-    enableRootSlice = true;
-    enableSystemSlice = true;
-    enableUserSlices = true;
-    settings.OOM = {
-      # DefaultMemoryPressureLimit = "60%";
-      DefaultMemoryPressureDurationSec = "1s"; # Works surprisingly well with minimal issues
-    };
+    enableNotifications = true; # Notification whenever it kills something
+    extraArgs = [
+      "-g" # kill the whole process group
+    ];
   };
-
-  ### Exceptions
-  systemd.services.sshd.serviceConfig.ManagedOOMPreference = "avoid";
 
   # fish + zsh
   programs = {
