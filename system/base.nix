@@ -63,6 +63,12 @@
     ];
   };
 
+  # Hardware stuff
+  # ## Power Management stuff
+  # ### Already auto enabled
+  # https://github.com/NixOS/nixpkgs/blob/4fa4fdfc61c7a026bda9bb5de3f579114028e008/nixos/modules/config/power-management.nix#L18-L19
+  # powerManagement.enable = true;
+
   ## Enable firmware updater
   services.fwupd.enable = true;
 
