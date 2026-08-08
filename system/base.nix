@@ -80,13 +80,22 @@
   ## Clean /tmp on boot
   boot.tmp.cleanOnBoot = true;
 
-  ## Enable earlyoom
+  ## OOM shi
+  ### Enable systemd-oomd
+  ### Works via PSI pressure, which updates every 10s, can't handle forkbombs etc
+  systemd.oomd = {
+    enable = true; # default since 24.05
+    enableRootSlice = true;
+    enableSystemSlice = true;
+    enableUserSlices = true;
+  };
+
+  ### Enable earlyoom
+  ### Works based on sole memory availability, more faster and reacctive
+  ### can solve forkbombs
   services.earlyoom = {
     enable = true;
     enableNotifications = true; # Notification whenever it kills something
-    extraArgs = [
-      "-g" # kill the whole process group
-    ];
   };
 
   # fish + zsh
