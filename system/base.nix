@@ -13,6 +13,8 @@
   nixpkgs.config.allowUnfree = true;
   nix.registry.nixpkgs.flake = inputs.nixpkgs; # explicitly set nixpkgs to system nixpkgs
   nix.settings = {
+    keep-outputs = true; # keeps compiler etc build pre-requisites
+    keep-derivations = true;
     auto-optimise-store = true;
     trusted-users = [
       "@wheel"
@@ -53,13 +55,13 @@
     fontconfig.useEmbeddedBitmaps = true;
     fontDir.enable = true; # symlinks all host fonts to /run/current-system/sw/share/X11/fonts
 
-    packages = with pkgs; [
+    packages = [
       # MS Fonts
-      corefonts
+      pkgs.corefonts
 
       # Install Noto fonts
-      noto-fonts
-      noto-fonts-color-emoji
+      pkgs.noto-fonts
+      pkgs.noto-fonts-color-emoji
     ];
   };
 
