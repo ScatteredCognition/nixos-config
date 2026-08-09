@@ -15,8 +15,8 @@
       pkgs.intel-media-driver
       pkgs.intel-vaapi-driver
       pkgs.intel-compute-runtime
-      pkgs.intel-ocl
       pkgs.vpl-gpu-rt
+      # pkgs.intel-ocl # needs to be built from source
       # pkgs.intel-media-sdk # marked as insecure
     ];
   };
