@@ -63,7 +63,10 @@
       # hardware-specific stuff
       hwModule = {
         hardwareConfiguration = [ ./hw/hardware-configuration.nix ];
-        dell-l3530 = [ ./hw/dell-l3530.nix ];
+        dell-l3530 = [
+          ./hw/device/dell-l3530.nix
+          ./hw/gpu/intel.nix
+        ];
         # add other hw stuff here
       };
 

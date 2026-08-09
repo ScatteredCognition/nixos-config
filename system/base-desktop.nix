@@ -32,6 +32,11 @@
   # Timezone and locale stuff handled in base.nix
 
   # Hardware stuff
+  ## Graphics stuff
+  ### Enables Mesa etc, intel/AMD/nvidia stuff
+  ### in ./hw/gpu/<vendor>.nix
+  hardware.graphics.enable = true;
+
   ## Bluetooth stuff
   hardware.bluetooth = {
     enable = true;
