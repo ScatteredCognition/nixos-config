@@ -103,7 +103,8 @@
         let
           commonDesktopModules = [
             ./system/base-desktop.nix # base-desktop core
-            ./apps.nix # Apps etc
+            ./apps/apps.nix # Apps etc
+            ./apps/app-fixes.nix
             ./misc/usr-fix.nix # Misc
           ];
         in

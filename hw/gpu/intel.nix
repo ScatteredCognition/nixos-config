@@ -20,4 +20,8 @@
       # pkgs.intel-media-sdk # marked as insecure
     ];
   };
+
+  # environment.sessionVariables = {
+  #   LIBVA_DRIVER_NAME = "iHD";
+  # }; # Optionally, set the environment variable
 }

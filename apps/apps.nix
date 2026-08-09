@@ -114,4 +114,5 @@
     # Flatpak apps
     # packages = [ "flathub:app/org.gnome.World.PikaBackup" ];
   };
+
 }
