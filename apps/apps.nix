@@ -115,4 +115,10 @@
     # packages = [ "flathub:app/org.gnome.World.PikaBackup" ];
   };
 
+  # Appimage support
+  programs.appimage = {
+    enable = true;
+    binfmt = true;
+  };
+
 }
