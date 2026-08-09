@@ -15,7 +15,7 @@
               meta
               passthru
               ;
-            name = "kdenlive-${kprev.kdenlive.version}";
+            name = "kdenlive-crashfix";
             paths = [ kprev.kdenlive ];
             nativeBuildInputs = [ prev.makeWrapper ];
             postBuild = ''
