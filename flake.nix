@@ -14,12 +14,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # lanzaboot
-    lanzaboote = {
-      url = "github:nix-community/lanzaboote";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     # nix-flatpak
     nix-flatpak = {
       url = "github:gmodena/nix-flatpak";
@@ -54,22 +48,17 @@
           modules = modules;
         };
 
-      # for subtracting lists and converting modules to lists
-      subtractLists = nixpkgs.lib.lists.subtractLists;
-      # toList = nixpkgs.lib.lists.toList;
-
-      # lanzaboote
-      # So removeModule isn't dependant on a hardcoded path
-      lanzabooteModule = [ ./system/lanzaboote.nix ];
-
       # hardware-specific stuff
       hwModule = {
+        # hardware-configuration.nix
         hardwareConfiguration = [ ./hw/hardware-configuration.nix ];
+
+        # add other hw stuff here
+        # Dell Latitude 3530
         dell-l3530 = [
           ./hw/device/dell-l3530.nix
           ./hw/gpu/intel.nix
         ];
-        # add other hw stuff here
       };
 
       # Language stuff
@@ -78,15 +67,15 @@
       };
 
       # Inputs module
+      # Needed for baseModule as they pull in disko deps and whatnot
       inputsModule = [
         inputs.disko.nixosModules.disko
-        inputs.lanzaboote.nixosModules.lanzaboote
         inputs.nix-flatpak.nixosModules.nix-flatpak
       ];
 
       # base
       baseModule =
-        (lanzabooteModule ++ hwModule.hardwareConfiguration) # Include Lanzaboote and hwconf
+        (hwModule.hardwareConfiguration) # Include hardware-configuration.nix
         ++ inputsModule # Include flake inputs
         ++ [
           # System stuff
@@ -123,24 +112,16 @@
 
     in
     {
+      # Main system config part
       nixosConfigurations =
         let
-          # base without any DE/GUI
-          base = {
-            # Install config
-            Install = (
-              (subtractLists lanzabooteModule baseModule) # base module minus lanzaboote
-              # Add language support here
-              ++ langModule.bn_BD
-            );
+          # base stuff with language config etc
+          base = [
+            baseModule # base module
 
-            # System config w/ lanzaboote
-            System = (
-              baseModule # base module
-              # Add language support here
-              ++ langModule.bn_BD
-            );
-          };
+            # Add language support here
+            langModule.bn_BD # Bangla support
+          ];
 
         in
         # Merges all the generated configs together
@@ -148,12 +129,10 @@
 
           (lib.concatMapAttrs (name: modules: {
             # Generates base-{nogui, desktop, gnome, kde, cosmic} and their -install variants
-            "base-${name}" = mkSystem (base.System ++ modules);
-            "base-${name}-install" = mkSystem (base.Install ++ modules);
+            "base-${name}" = mkSystem (base ++ modules);
 
             # Generates the base variants with Dell Latitude 3530 patches
-            "dell-l3530-${name}" = mkSystem (base.System ++ modules ++ hwModule.dell-l3530);
-            "dell-l3530-${name}-install" = mkSystem (base.Install ++ modules ++ hwModule.dell-l3530);
+            "dell-l3530-${name}" = mkSystem (base ++ modules ++ hwModule.dell-l3530);
           }) desktopModule)
         ];
     };

@@ -28,9 +28,35 @@
   # Boot stuff
   boot = {
     loader = {
-      systemd-boot.enable = lib.mkDefault true; # systemd-boot
-      timeout = 0; # Hides boot selector
-      efi.canTouchEfiVariables = true;
+      # timeout = 0; # Hides boot selector
+      efi.canTouchEfiVariables = true; # Allow adding EFI boot entries, modifying NVRAM
+
+      limine = {
+        enable = true; # Enables limine
+        enableEditor = false; # Disables the boot entry editor
+        maxGenerations = 16; # Maximum generations to keep in /boot
+
+        # EFI/BIOS support is handled automatically
+
+        # Secureboot pre-req
+        validateChecksums = true; # Validate boot-file checksums before booting.
+        panicOnChecksumMismatch = true; # Treats a checksum mismatch as fatal.
+        enrollConfig = true; # Enrolls/hashes the generated Limine configuration
+
+        # Secureboot
+        secureBoot = {
+          enable = true; # Enables secureboot support
+          # Create/Enroll keys if missing
+          autoGenerateKeys = true;
+          autoEnrollKeys = {
+            enable = true;
+            extraArgs = [
+              "--microsoft"
+              "--firmware-builtin"
+            ];
+          };
+        };
+      };
     };
   };
 
