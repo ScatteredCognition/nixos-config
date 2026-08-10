@@ -44,6 +44,8 @@
 
     # Define modules
     let
+      inherit (nixpkgs) lib;
+
       # mkSystem
       mkSystem =
         modules:
@@ -109,9 +111,14 @@
           ];
         in
         rec {
-          default = gnome-desktop;
-          gnome-desktop = commonDesktopModules ++ [ ./desktop/gnome-desktop.nix ];
-          kde-desktop = commonDesktopModules ++ [ ./desktop/kde-desktop.nix ];
+          nogui = [ ]; # no desktop
+
+          # Desktops
+          default = gnome;
+          desktop = default;
+          gnome = commonDesktopModules ++ [ ./desktop/gnome-desktop.nix ];
+          kde = commonDesktopModules ++ [ ./desktop/kde-desktop.nix ];
+          cosmic = commonDesktopModules ++ [ ./desktop/cosmic-desktop.nix ];
         };
 
     in
@@ -135,23 +142,19 @@
             );
           };
 
-          baseDesktop = {
-            Install = base.Install ++ desktopModule.default;
-            System = base.System ++ desktopModule.default;
-          };
-
         in
-        {
-          # Install configs
-          base-install = mkSystem base.Install;
-          base-desktop-install = mkSystem baseDesktop.Install;
+        # Merges all the generated configs together
+        lib.mergeAttrsList [
 
-          # Base configs
-          base = mkSystem base.System;
-          base-desktop = mkSystem baseDesktop.System;
+          (lib.concatMapAttrs (name: modules: {
+            # Generates base-{nogui, desktop, gnome, kde, cosmic} and their -install variants
+            "base-${name}" = mkSystem (base.System ++ modules);
+            "base-${name}-install" = mkSystem (base.Install ++ modules);
 
-          # Device-specific configs
-          dell-l3530-nixos = mkSystem (baseDesktop.System ++ hwModule.dell-l3530);
-        };
+            # Generates the base variants with Dell Latitude 3530 patches
+            "dell-l3530-${name}" = mkSystem (base.System ++ modules ++ hwModule.dell-l3530);
+            "dell-l3530-${name}-install" = mkSystem (base.Install ++ modules ++ hwModule.dell-l3530);
+          }) desktopModule)
+        ];
     };
 }
