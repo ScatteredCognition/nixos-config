@@ -109,28 +109,23 @@
           kde = commonDesktopModules ++ [ ./desktop/kde-desktop.nix ];
           cosmic = commonDesktopModules ++ [ ./desktop/cosmic-desktop.nix ];
         };
-
     in
     {
       # Main system config part
       nixosConfigurations =
         let
           # base stuff with language config etc
-          base = [
+          base =
             baseModule # base module
-
             # Add language support here
-            langModule.bn_BD # Bangla support
-          ];
-
+            ++ langModule.bn_BD # Bangla support
+            ++ [ ]; # End
         in
         # Merges all the generated configs together
         lib.mergeAttrsList [
-
           (lib.concatMapAttrs (name: modules: {
-            # Generates base-{nogui, desktop, gnome, kde, cosmic} and their -install variants
+            # Generates base-{nogui, desktop, gnome, kde, cosmic}
             "base-${name}" = mkSystem (base ++ modules);
-
             # Generates the base variants with Dell Latitude 3530 patches
             "dell-l3530-${name}" = mkSystem (base ++ modules ++ hwModule.dell-l3530);
           }) desktopModule)
