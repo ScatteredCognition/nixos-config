@@ -40,14 +40,6 @@
     let
       inherit (nixpkgs) lib;
 
-      # mkSystem
-      mkSystem =
-        modules:
-        nixpkgs.lib.nixosSystem {
-          specialArgs = { inherit inputs; };
-          modules = modules;
-        };
-
       # hardware-specific stuff
       hwModule = {
         # hardware-configuration.nix
@@ -58,6 +50,7 @@
         dell-l3530 = [
           ./hw/device/dell-l3530.nix
           ./hw/gpu/intel.nix
+          ./hw/fprint/chipsailing-cs9711.nix
         ];
       };
 
@@ -86,7 +79,7 @@
           ./system/users.nix
 
           # dirty cache writeback fix
-          ./misc/disk-writeback-fix.nix
+          ./misc/fixes/disk-writeback-fix.nix
         ];
 
       # base-desktop
@@ -96,19 +89,27 @@
             ./system/base-desktop.nix # base-desktop core
             ./apps/apps.nix # Apps etc
             ./apps/app-fixes.nix
-            ./misc/usr-fix.nix # Misc
+            ./misc/fixes/usr-fix.nix # Misc
           ];
         in
         rec {
           nogui = [ ]; # no desktop
 
           # Desktops
-          default = gnome;
-          desktop = default;
+          desktop = gnome; # default target for desktop
           gnome = commonDesktopModules ++ [ ./desktop/gnome-desktop.nix ];
           kde = commonDesktopModules ++ [ ./desktop/kde-desktop.nix ];
           cosmic = commonDesktopModules ++ [ ./desktop/cosmic-desktop.nix ];
         };
+
+      # mkSystem
+      mkSystem =
+        modules:
+        nixpkgs.lib.nixosSystem {
+          specialArgs = { inherit inputs; };
+          modules = modules;
+        };
+
     in
     {
       # Main system config part
@@ -118,16 +119,15 @@
           base =
             baseModule # base module
             # Add language support here
-            ++ langModule.bn_BD # Bangla support
-            ++ [ ]; # End
+            ++ langModule.bn_BD; # Bangla support
         in
         # Merges all the generated configs together
         lib.mergeAttrsList [
-          (lib.concatMapAttrs (name: modules: {
+          (lib.concatMapAttrs (name: desktop: {
             # Generates base-{nogui, desktop, gnome, kde, cosmic}
-            "base-${name}" = mkSystem (base ++ modules);
+            "base-${name}" = mkSystem (base ++ desktop);
             # Generates the base variants with Dell Latitude 3530 patches
-            "dell-l3530-${name}" = mkSystem (base ++ modules ++ hwModule.dell-l3530);
+            "dell-l3530-${name}" = mkSystem (base ++ desktop ++ hwModule.dell-l3530);
           }) desktopModule)
         ];
     };

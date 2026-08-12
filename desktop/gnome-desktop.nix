@@ -96,6 +96,9 @@
     GST_PLUGIN_PATH = "/run/current-system/sw/lib/gstreamer-1.0/";
   };
 
+  # workaround for showing fingerprint options in settings
+  services.desktopManager.gnome.sessionPath = [ pkgs.gdm ];
+
   # Enable the GNOME extensions ootb
   programs.dconf.profiles.user.databases = [
     {
