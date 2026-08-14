@@ -1,3 +1,4 @@
+# chipsailing-cs9711.nix
 { pkgs, ... }:
 
 let

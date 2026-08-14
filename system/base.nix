@@ -132,6 +132,16 @@
     enableNotifications = true; # Notification whenever it kills something
   };
 
+  # ENABLE in 26.11
+  # replace sudo with run0
+  # security.sudo.enable = false;
+  # security.run0 = {
+  #   enable = true;
+  #   sudo-shim.enable = true;
+  #   persistentAuth.enable = true;
+  #   # persistentAuth.enableRemote = true;
+  # };
+
   # fish + zsh
   programs = {
     fish.enable = true;
