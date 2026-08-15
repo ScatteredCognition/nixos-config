@@ -23,6 +23,7 @@
     pkgs.blender
     pkgs.naps2
     pkgs.pika-backup
+    pkgs.foliate
   ]
 
   # Conditional statement to install GTK/Qt variants depending on whether GNOME is installed
