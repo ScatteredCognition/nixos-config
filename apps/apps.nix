@@ -87,7 +87,11 @@
     # OCI-container support
     containers = {
       enable = true;
-      registries.search = [ "docker.io" ];
+      registries.search = [
+        "docker.io"
+        "quay.io"
+        "ghcr.io"
+      ];
     };
 
     # podman
