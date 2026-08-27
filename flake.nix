@@ -46,11 +46,13 @@
         hardwareConfiguration = [ ./hw/hardware-configuration.nix ];
 
         # add other hw stuff here
+        # Extra hardware
+        extra = [ ./hw/fprint/chipsailing-cs9711.nix ];
+
         # Dell Latitude 3530
         dell-l3530 = [
           ./hw/device/dell-l3530.nix
           ./hw/gpu/intel.nix
-          ./hw/fprint/chipsailing-cs9711.nix
         ];
       };
 
@@ -68,7 +70,7 @@
 
       # base
       baseModule =
-        (hwModule.hardwareConfiguration) # Include hardware-configuration.nix
+        (hwModule.hardwareConfiguration ++ hwModule.extra) # Include hardware-configuration.nix
         ++ inputsModule # Include flake inputs
         ++ [
           # System stuff
