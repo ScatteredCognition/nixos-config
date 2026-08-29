@@ -13,6 +13,7 @@ let
       hash = "sha256-QGrBNqbRNqLZIURI66xkenlQamNW+DQU4WS+CLN4zM8=";
     };
 
+    # Set rescan delay to 1000ms from 250ms default
     postPatch = (oldAttrs.postPatch or "") + ''
       sed -i 's/#define CS9711_DEFAULT_RESET_SLEEP.*/#define CS9711_DEFAULT_RESET_SLEEP  1000/' \
         libfprint/drivers/cs9711/cs9711.c
