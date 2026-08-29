@@ -91,7 +91,6 @@
             ./system/base-desktop.nix # base-desktop core
             ./apps/apps.nix # Apps etc
             ./apps/app-fixes.nix
-            ./apps/services.nix
             ./misc/fixes/usr-fix.nix # Misc
           ];
         in
