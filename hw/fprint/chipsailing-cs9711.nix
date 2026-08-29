@@ -14,7 +14,7 @@ let
     };
 
     postPatch = (oldAttrs.postPatch or "") + ''
-      sed -i 's/#define CS9711_DEFAULT_RESET_SLEEP.*/#define CS9711_DEFAULT_RESET_SLEEP  1500/' \
+      sed -i 's/#define CS9711_DEFAULT_RESET_SLEEP.*/#define CS9711_DEFAULT_RESET_SLEEP  1000/' \
         libfprint/drivers/cs9711/cs9711.c
     '';
 
