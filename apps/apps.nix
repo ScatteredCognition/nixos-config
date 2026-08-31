@@ -1,4 +1,10 @@
 # apps.nix
+## adds a minimal list of apps, use flatpaks, distrobox for extra stuff
+## To stay pure nix, use the following instructions
+## nix profile add nixpkgs#package_name
+## For unfree stuff,
+## add --impure flag to nix profile add for unfree stuff
+## Also add { allowUnfree = true; } to ~/.config/nixpkgs/config.nix
 {
   pkgs,
   inputs,
@@ -7,71 +13,92 @@
 }:
 
 {
-  environment.systemPackages = [
+  # custom = { nix-gaming.enable = false; zen-browser.enable = true; };
+
+  environment.systemPackages =
+    # Browser
+    (
+      if (config.custom.zen-browser.enable or false) then
+        [ inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default ]
+      else
+        [ pkgs.firefox ] # backup if zen breaks
+    )
+
     # Basic apps
-    inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
-    # pkgs.firefox # backup if zen breaks
-    pkgs.chromium
-    pkgs.tor-browser
-    pkgs.qbittorrent
-    pkgs.vlc
-    # pkgs.onlyoffice-desktopeditors # Has issues finding fonts even after applying workarounds, use the flatpak
-    pkgs.zed-editor
-    pkgs.krita
-    pkgs.gimp-with-plugins
-    pkgs.kdePackages.kdenlive
-    pkgs.blender
-    pkgs.naps2
-    pkgs.pika-backup
-    pkgs.foliate
-  ]
+    ++ [
+      pkgs.qbittorrent
+      pkgs.vlc
+      pkgs.zed-editor
+      pkgs.naps2
+      pkgs.pika-backup
+      pkgs.foliate
+    ]
 
-  # Conditional statement to install GTK/Qt variants depending on whether GNOME is installed
-  ++ (
-    if config.services.desktopManager.gnome.enable then
-      # Install if GNOME installed
-      [
-        pkgs.libreoffice-fresh
-      ]
+    # Nix LSP support
+    ++ [
+      pkgs.nixd
+      pkgs.nil
+    ]
 
-    else
-      # Install if GNOME isn't installed
-      [ pkgs.libreoffice-qt6-fresh ]
-  )
+    # Distrobox and container-stuff
+    ++ [
+      pkgs.distrobox
+      pkgs.podman-compose
+      pkgs.docker-compose
+    ]
 
-  # Nix LSP support
-  ++ [
-    pkgs.nixd
-    pkgs.nil
-  ]
+    # Wine
+    # Installs nix-gaming winetricks if config.custom.nix-gaming.enable is true, otherwise falls back to system wine
+    ++ (
+      if (config.custom.nix-gaming.enable or false) then
+        (with inputs.nix-gaming.packages.${pkgs.stdenv.hostPlatform.system}; [
+          wine-cachyos
+          winetricks-git
+        ])
+        ++ [
+          # workaround for NixOS/nixpkgs#338367: winetricks looks for wine64 on WoW64 builds
+          (pkgs.runCommand "wine64-compat" { } ''
+            mkdir -p $out/bin
+            ln -s ${
+              inputs.nix-gaming.packages.${pkgs.stdenv.hostPlatform.system}.wine-tkg
+            }/bin/wine $out/bin/wine64
+          '')
+        ]
+      else
+        [
+          pkgs.wineWow64Packages.staging
+          pkgs.winetricks
+        ]
+    )
 
-  # Distrobox and container-stuff
-  ++ [
-    pkgs.distrobox
-    pkgs.podman-compose
-    pkgs.docker-compose
-  ]
+    # slop stuff
+    ++ [
+      # pkgs.chromium
+      # pkgs.tor-browser
+      # pkgs.onlyoffice-desktopeditors # Has issues finding fonts even after applying workarounds, use the flatpak
+      # pkgs.krita
+      # pkgs.gimp-with-plugins
+      # pkgs.kdePackages.kdenlive
+      # pkgs.blender
+    ]
 
-  # Wine
-  ++ [
-    pkgs.wineWow64Packages.staging
-    pkgs.winetricks
-  ]
+    # Conditional statement to install GTK/Qt variants depending on whether GNOME is installed
+    # ++ (
+    #   if config.services.desktopManager.gnome.enable then
+    #     # Install if GNOME installed
+    #     [
+    #       pkgs.libreoffice-fresh
+    #     ]
+    #
+    #   else
+    #     # Install if GNOME isn't installed
+    #     [ pkgs.libreoffice-qt6-fresh ]
+    # )
 
-  # AI shi
-  # ++ [
-  #   pkgs.crush
-  #   pkgs.mcp-nixos
-  #   pkgs.mcp-server-filesystem
-  #   pkgs.mcp-server-git
-  #   pkgs.mcp-server-sequential-thinking
-  #   pkgs.mcp-server-fetch
-  # ]
-
-  # Misc CLI
-  ++ [
-    pkgs.wl-clipboard
-  ];
+    # Misc CLI
+    ++ [
+      pkgs.wl-clipboard
+    ];
 
   # Cloudflare WARP
   services.cloudflare-warp.enable = true;

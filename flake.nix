@@ -25,6 +25,13 @@
       url = "github:0xc000022070/zen-browser-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # nix-gaming
+    nix-gaming = {
+      url = "github:fufexan/nix-gaming";
+      # inputs.nixpkgs.follows = "nixpkgs"; # forces compile from source
+    };
+
   };
 
   # Outputs
@@ -32,7 +39,6 @@
     {
       self,
       nixpkgs,
-      zen-browser,
       ...
     }@inputs: # destructures the previous variables into individual keys
 
@@ -91,6 +97,7 @@
             ./system/base-desktop.nix # base-desktop core
             ./apps/apps.nix # Apps etc
             ./apps/app-fixes.nix
+            ./apps/app-extras.nix
             ./misc/fixes/usr-fix.nix # Misc
           ];
         in
