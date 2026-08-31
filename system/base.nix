@@ -58,6 +58,9 @@
         };
       };
     };
+
+    # Add ntsync support
+    kernelModules = [ "ntsync" ];
   };
 
   # Networking

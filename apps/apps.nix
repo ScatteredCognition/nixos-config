@@ -18,6 +18,21 @@
   #   nix-gaming.enable = false;
   # };
 
+  # workaround for NixOS/nixpkgs#338367: point winetricks at the real
+  # (unwrapped) binaries so its arch/WoW64 detection works
+  # set wine = to the wine version you are using rn
+  environment.sessionVariables =
+    if (config.custom.nix-gaming.enable or false) then
+      let
+        wine = inputs.nix-gaming.packages.${pkgs.stdenv.hostPlatform.system}.wine-cachyos;
+      in
+      {
+        WINE_BIN = "${wine}/bin/.wine";
+        # WINESERVER_BIN = "${wine}/bin/.wineserver";
+      }
+    else
+      { };
+
   environment.systemPackages =
     # Browser
     (
@@ -58,15 +73,6 @@
           wine-cachyos
           winetricks-git
         ])
-        ++ [
-          # workaround for NixOS/nixpkgs#338367: winetricks looks for wine64 on WoW64 builds
-          (pkgs.runCommand "wine64-compat" { } ''
-            mkdir -p $out/bin
-            ln -s ${
-              inputs.nix-gaming.packages.${pkgs.stdenv.hostPlatform.system}.wine-tkg
-            }/bin/wine $out/bin/wine64
-          '')
-        ]
       else
         [
           pkgs.wineWow64Packages.staging
