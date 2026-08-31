@@ -13,10 +13,12 @@
 }:
 
 {
-  # custom = {
-  #   zen-browser.enable = true;
-  #   nix-gaming.enable = false;
-  # };
+  # Set nix-gaming.enable to false during first rebuild after enabling cachix
+  # Then do a reboot, set it to true, rebuild once more for the cachix cache to be active
+  custom = {
+    # zen-browser.enable = true;
+    # nix-gaming.enable = false;
+  };
 
   # workaround for NixOS/nixpkgs#338367: point winetricks at the real
   # (unwrapped) binaries so its arch/WoW64 detection works
