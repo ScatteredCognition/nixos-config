@@ -48,6 +48,7 @@
       pkgs.tor-browser
       pkgs.shotcut
       pkgs.gimp-with-plugins
+      pkgs.retroarch-free
       pkgs.blender
       pkgs.qbittorrent
       pkgs.vlc
