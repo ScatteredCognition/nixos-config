@@ -13,7 +13,10 @@
 }:
 
 {
-  # custom = { nix-gaming.enable = false; zen-browser.enable = true; };
+  # custom = {
+  #   zen-browser.enable = true;
+  #   nix-gaming.enable = false;
+  # };
 
   environment.systemPackages =
     # Browser
