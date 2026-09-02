@@ -1,4 +1,5 @@
 # nixos-config
+**Last edited: 02-09-2026 (git commit e87b13981e63d4e0280a024e4de1e10f2b89fa67)**
 
 Declarative, flake-based NixOS configuration. One flake builds every variant: headless or desktop (GNOME / KDE Plasma / COSMIC), generic or device-specific (currently a Dell Latitude 3530).
 
