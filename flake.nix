@@ -126,27 +126,23 @@
         baseModule # Bare basic system config
 
         # Add language support here
+        # English is added by default
         langModule.bn_BD
       ];
 
-      # mkSystem
-      mkSystem =
-        modules:
-        nixpkgs.lib.nixosSystem {
-          specialArgs = { inherit inputs; };
-          modules = modules;
-        };
-
     in
 
+    # Main system config part
     {
-      # Main system config part
       nixosConfigurations = lib.listToAttrs (
         lib.mapCartesianProduct
           (
             { host, desktop }:
             lib.nameValuePair "${host}-${desktop}" (
-              mkSystem (baseSystem ++ desktopModule.${desktop} ++ hostModule.${host})
+              nixpkgs.lib.nixosSystem {
+                specialArgs = { inherit inputs; };
+                modules = baseSystem ++ desktopModule.${desktop} ++ hostModule.${host};
+              }
             )
           )
           {
