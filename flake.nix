@@ -75,9 +75,9 @@
       ];
 
       # base
+      ## Hardware/host-specific stuff separated out into hostModule
       baseModule =
-        (hwModule.hardwareConfiguration ++ hwModule.extra) # Include hardware-configuration.nix
-        ++ inputsModule # Include flake inputs
+        inputsModule # Include flake inputs
         ++ [
           # System stuff
           ./system/base.nix
@@ -111,6 +111,24 @@
           cosmic = commonDesktopModules ++ [ ./desktop/cosmic-desktop.nix ];
         };
 
+      # Hosts, devices to deploy on
+      hostModule = {
+        generic = [ hwModule.hardwareConfiguration ];
+        dell-l3530 = [
+          hwModule.hardwareConfiguration
+          hwModule.dell-l3530
+          hwModule.extra
+        ];
+      };
+
+      # Define baseSystem, an abstraction over baseModule for ease of use in mkSystem
+      baseSystem = [
+        baseModule # Bare basic system config
+
+        # Add language support here
+        langModule.bn_BD
+      ];
+
       # mkSystem
       mkSystem =
         modules:
@@ -120,24 +138,21 @@
         };
 
     in
+
     {
       # Main system config part
-      nixosConfigurations =
-        let
-          # base stuff with language config etc
-          base =
-            baseModule # base module
-            # Add language support here
-            ++ langModule.bn_BD; # Bangla support
-        in
-        # Merges all the generated configs together
-        lib.mergeAttrsList [
-          (lib.concatMapAttrs (name: desktop: {
-            # Generates base-{nogui, desktop, gnome, kde, cosmic}
-            "base-${name}" = mkSystem (base ++ desktop);
-            # Generates the base variants with Dell Latitude 3530 patches
-            "dell-l3530-${name}" = mkSystem (base ++ desktop ++ hwModule.dell-l3530);
-          }) desktopModule)
-        ];
+      nixosConfigurations = lib.listToAttrs (
+        lib.mapCartesianProduct
+          (
+            { host, desktop }:
+            lib.nameValuePair "${host}-${desktop}" (
+              mkSystem (baseSystem ++ desktopModule.${desktop} ++ hostModule.${host})
+            )
+          )
+          {
+            host = lib.attrNames hostModule;
+            desktop = lib.attrNames desktopModule;
+          }
+      );
     };
 }

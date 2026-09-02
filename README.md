@@ -1,7 +1,7 @@
 # nixos-config
-**Last edited: 02-09-2026 (git commit e87b13981e63d4e0280a024e4de1e10f2b89fa67)**
+**Last edited: 02-09-2026 (git commit bbffc4d24e0e87bd0c4e6e872229d7a9df3bde50)**
 
-Declarative, flake-based NixOS configuration. One flake builds every variant: headless or desktop (GNOME / KDE Plasma / COSMIC), generic or device-specific (currently a Dell Latitude 3530).
+Declarative, flake-genericd NixOS configuration. One flake builds every variant: headless or desktop (GNOME / KDE Plasma / COSMIC), generic or device-specific (currently a Dell Latitude 3530).
 
 - **Channel:** `nixos-26.05`
 - **Bootloader:** Limine with Secure Boot signing and automatic sbctl key management
@@ -32,7 +32,7 @@ Declarative, flake-based NixOS configuration. One flake builds every variant: he
 │   │   ├── disk-writeback-fix.nix  #   vm.dirty_* tuning against write stalls
 │   │   └── usr-fix.nix             #   bindfs /usr/share/{fonts,icons,themes} for Flatpak/distrobox
 │   └── lang/bn_BD.nix              # Bangla locale + OpenBangla IME (ibus & fcitx5)
-└── system/                         # Everything that makes a bootable base system
+└── system/                         # Everything that makes a bootable generic system
     ├── base.nix                    #   Limine + Secure Boot, Nix settings, fonts, locale, OOM, fprintd
     ├── base-desktop.nix            #   Desktop-agnostic layer: PipeWire, Bluetooth, printing, Plymouth
     ├── disko.nix                   #   Declarative partitioning (DESTROYS the target disk)
@@ -52,16 +52,16 @@ Declarative, flake-based NixOS configuration. One flake builds every variant: he
 | `langModule` | `bn_BD` Bangla locale/IME support |
 | `inputsModule` | External NixOS modules: disko, nix-flatpak |
 | `baseModule` | hw + inputs + `system/*` → a complete headless system |
-| `desktopModule` | `commonDesktopModules` (`base-desktop.nix`, `apps/*`, `usr-fix.nix`) + one DE module. `desktop` is an alias for `gnome`; `nogui` adds nothing |
+| `desktopModule` | `commonDesktopModules` (`generic-desktop.nix`, `apps/*`, `usr-fix.nix`) + one DE module. `desktop` is an alias for `gnome`; `nogui` adds nothing |
 | `mkSystem` | Thin wrapper over `lib.nixosSystem`, injecting `inputs` via `specialArgs` |
 
 `lib.concatMapAttrs` maps over `desktopModule` and emits two families of configurations:
 
 | Flake output | What you get |
 |---|---|
-| `base-nogui` | Headless base system |
-| `base-desktop` | Base + GNOME (the `desktop` alias) |
-| `base-gnome` / `base-kde` / `base-cosmic` | Base + that desktop |
+| `generic-nogui` | Headless generic system |
+| `generic-desktop` | generic + GNOME (the `desktop` alias) |
+| `generic-gnome` / `generic-kde` / `generic-cosmic` | generic + that desktop |
 | `dell-l3530-<variant>` | Any of the above, plus Dell Latitude 3530 quirks (hostname `dell-nixos`, i915/iwlwifi tuning) |
 
 Notes on inputs:
@@ -102,9 +102,9 @@ Notes on inputs:
    ```
 7. Install the variant you want, e.g.:
    ```sh
-   sudo nixos-install --flake .#base-gnome --no-root-password
+   sudo nixos-install --flake .#generic-gnome --no-root-password
    ```
-   Use `base-nogui` for a headless install, `base-kde`/`base-cosmic` for the other desktops, or a `dell-l3530-*` variant on that machine.
+   Use `generic-nogui` for a headless install, `generic-kde`/`generic-cosmic` for the other desktops, or a `dell-l3530-*` variant on that machine.
 8. Reboot into the new system and set passwords — `users.nix` ships with blank password hashes:
    ```sh
    sudo passwd faeizmahrus
@@ -113,7 +113,7 @@ Notes on inputs:
 
 ## Secure Boot (Limine + sbctl)
 
-`system/base.nix` enables Limine with `secureBoot.enable`, `autoGenerateKeys` and `autoEnrollKeys` (with `--microsoft --firmware-builtin`), plus config-checksum enrollment (`enrollConfig`, `validateChecksums`, `panicOnChecksumMismatch`). Keys are created and enrolled automatically — no manual `sbctl create-keys` / `enroll-keys` step, and no separate unsigned `-install` configuration is needed anymore.
+`system/generic.nix` enables Limine with `secureBoot.enable`, `autoGenerateKeys` and `autoEnrollKeys` (with `--microsoft --firmware-builtin`), plus config-checksum enrollment (`enrollConfig`, `validateChecksums`, `panicOnChecksumMismatch`). Keys are created and enrolled automatically — no manual `sbctl create-keys` / `enroll-keys` step, and no separate unsigned `-install` configuration is needed anymore.
 
 One-time setup:
 
@@ -146,7 +146,7 @@ Note: PCR 7 binds to the Secure Boot state and keys. If you ever re-enroll or ro
 Iterate and deploy with:
 
 ```sh
-sudo nixos-rebuild switch --flake path:$PWD#base-desktop
+sudo nixos-rebuild switch --flake path:$PWD#generic-desktop
 ```
 
 For a new machine: add `hw/device/<name>.nix` (plus GPU/fingerprint modules as needed), wire them into `hwModule` in `flake.nix`, and a full `<name>-{nogui,desktop,gnome,kde,cosmic}` family is generated automatically. Set `networking.hostName` in the device module (the default is `nixos`).
@@ -159,5 +159,5 @@ For a new machine: add `hw/device/<name>.nix` (plus GPU/fingerprint modules as n
    nix flake update
    ```
 3. Read the new release's changelog for breaking changes, then rebuild and reboot.
-4. Once everything checks out, bump `system.stateVersion` in `system/base.nix` to the new version.
+4. Once everything checks out, bump `system.stateVersion` in `system/generic.nix` to the new version.
 5. Rebuild and reboot again.
