@@ -36,7 +36,8 @@
       { };
 
   environment.systemPackages =
-    # Browser
+
+    # Main browser
     (
       if (config.custom.zen-browser.enable or false) then
         [ inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default ]
@@ -44,20 +45,28 @@
         [ pkgs.firefox ] # backup if zen breaks
     )
 
-    # Basic apps
+    # Extra browsers
     ++ [
       pkgs.chromium
       pkgs.tor-browser
+    ]
+
+    # Creative apps
+    ++ [
       pkgs.shotcut
       pkgs.gimp-with-plugins
-      pkgs.retroarch-free
       pkgs.blender
-      pkgs.qbittorrent
-      pkgs.vlc
+    ]
+
+    # Essentials + Emulation
+    ++ [
       pkgs.zed-editor
+      pkgs.vlc
+      pkgs.qbittorrent
       pkgs.naps2
-      pkgs.pika-backup
       pkgs.foliate
+      pkgs.pika-backup
+      pkgs.retroarch-free
     ]
 
     # Wine
