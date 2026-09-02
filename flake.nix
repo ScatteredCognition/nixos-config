@@ -113,22 +113,17 @@
 
       # Hosts, devices to deploy on
       hostModule = {
-        generic = [ hwModule.hardwareConfiguration ];
-        dell-l3530 = [
-          hwModule.hardwareConfiguration
-          hwModule.dell-l3530
-          hwModule.extra
-        ];
+        generic = hwModule.hardwareConfiguration;
+        dell-l3530 = hwModule.hardwareConfiguration ++ hwModule.dell-l3530 ++ hwModule.extra;
       };
 
       # Define baseSystem, an abstraction over baseModule for ease of use in mkSystem
-      baseSystem = [
+      baseSystem =
         baseModule # Bare basic system config
 
         # Add language support here
         # English is added by default
-        langModule.bn_BD
-      ];
+        ++ langModule.bn_BD;
 
     in
 

@@ -85,6 +85,11 @@
     pkgs.qgnomeplatform-qt6
   ]
 
+  # Add adw-gtk3 for gtk3 theming
+  ++ [
+    pkgs.adw-gtk3
+  ]
+
   # Install extra apps
   ++ [
     pkgs.resources
@@ -116,6 +121,11 @@
             appindicator.extensionUuid
             caffeine.extensionUuid
           ];
+        };
+
+        # Enable adw-gtk3 theme
+        "org/gnome/desktop/interface" = {
+          gtk-theme = "adw-gtk3"; # or "adw-gtk3"
         };
 
         # Default settings for extensions
