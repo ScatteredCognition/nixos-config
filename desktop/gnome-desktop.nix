@@ -92,7 +92,7 @@
 
   # Install extra apps
   ++ [
-    pkgs.resources
+    pkgs.mission-center
     pkgs.refine
   ];
 
