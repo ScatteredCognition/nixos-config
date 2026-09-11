@@ -155,6 +155,8 @@
   environment.systemPackages = [
     pkgs.git
     pkgs.fastfetch
+    pkgs.tree
+    pkgs.nix-tree
     pkgs.home-manager
   ]
 

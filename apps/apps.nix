@@ -113,6 +113,8 @@
     # Misc CLI
     ++ [
       pkgs.wl-clipboard
+      pkgs.yt-dlp
+      pkgs.aria2
     ];
 
   # Cloudflare WARP
