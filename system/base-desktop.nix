@@ -73,5 +73,10 @@
       alsa.enable = true;
       # alsa.support32Bit = true; # pulls in alot of 32bit deps
     };
+    # Input remapper
+    input-remapper = {
+      enable = true;
+      enableUdevRules = true; # re-applies on hotplug
+    };
   };
 }
