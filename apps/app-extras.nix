@@ -16,8 +16,25 @@
       default = true;
     };
     # antigravity-nix
-    antigravity-nix.enable = lib.mkEnableOption "antigravity-nix (patched w/o fhsEnv sandboxing)" // {
-      default = true;
+    antigravity-nix = {
+      # Enable switch
+      enable = lib.mkEnableOption "antigravity-nix (patched w/o fhsEnv sandboxing)" // {
+        default = true;
+      };
+
+      # Switch to selectt the /browser being used
+      browser = lib.mkOption {
+        type = lib.types.enum [
+          "auto"
+          "google-chrome"
+          "chromium"
+          "brave"
+          "ungoogled-chromium"
+          "vivaldi"
+        ];
+        default = "auto";
+        description = "Target browser for Antigravity /browser integration ('auto' prefers google-chrome if in systemPackages, otherwise chromium)";
+      };
     };
   };
 
