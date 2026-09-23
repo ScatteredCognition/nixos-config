@@ -7,10 +7,16 @@
 {
   options.custom = {
     # Create toggles
+    # nix-gaming
     nix-gaming.enable = lib.mkEnableOption "nix-gaming (precompiled binaries via Cachix)" // {
       default = true;
     };
-    zen-browser.enable = lib.mkEnableOption "zen-browser (precompiled)" // {
+    # zen-browser-flake
+    zen-browser-flake.enable = lib.mkEnableOption "zen-browser-flake (precompiled)" // {
+      default = true;
+    };
+    # antigravity-nix
+    antigravity-nix.enable = lib.mkEnableOption "antigravity-nix (patched w/o fhsEnv sandboxing)" // {
       default = true;
     };
   };

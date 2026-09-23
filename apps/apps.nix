@@ -39,8 +39,8 @@
 
     # Main browser
     (
-      if (config.custom.zen-browser.enable or false) then
-        [ inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default ]
+      if (config.custom.zen-browser-flake.enable or false) then
+        [ inputs.zen-browser-flake.packages.${pkgs.stdenv.hostPlatform.system}.default ]
       else
         [ pkgs.firefox ] # backup if zen breaks
     )
@@ -95,6 +95,17 @@
       else
         # Install if GNOME isn't installed
         [ pkgs.libreoffice-qt6-fresh ]
+    )
+
+    # AI agents
+    ++ (
+      if (config.custom.antigravity-nix.enable or false) then
+        (with inputs.antigravity-nix.packages.${pkgs.stdenv.hostPlatform.system}; [
+          google-antigravity-no-fhs
+          google-antigravity-cli
+        ])
+      else
+        [ pkgs.crush ] # terminal AI agent fallback
     )
 
     # Nix LSP support
