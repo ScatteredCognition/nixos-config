@@ -47,7 +47,7 @@
 
     # Extra browsers
     ++ [
-      pkgs.chromium
+      (pkgs.chromium.override { enableWideVine = true; })
       pkgs.tor-browser
     ]
 
