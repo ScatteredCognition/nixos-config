@@ -1,27 +1,27 @@
 # nixos-config
-**Last edited: 02-09-2026 (git commit bbffc4d24e0e87bd0c4e6e872229d7a9df3bde50)**
+**Last edited: 23-09-2026 (git commit 2cffb9cefd3936fbdf73d532b2a6831090b4d5de)**
 
-Declarative, flake-genericd NixOS configuration. One flake builds every variant: headless or desktop (GNOME / KDE Plasma / COSMIC), generic or device-specific (currently a Dell Latitude 3530).
+Declarative, flake-driven NixOS configuration. One flake builds every variant: headless or desktop (GNOME / KDE Plasma / COSMIC), generic or device-specific (currently a Dell Latitude 3530).
 
 - **Channel:** `nixos-26.05`
 - **Bootloader:** Limine with Secure Boot signing and automatic sbctl key management
 - **Disk:** disko-managed GPT → LUKS → btrfs (`@root`, `@home`, `@nix`), optional TPM2 auto-unlock
-- **Flake apps:** Zen Browser and nix-gaming (wine-cachyos), each behind a kill-switch with nixpkgs fallbacks
+- **Flake apps:** Zen Browser, nix-gaming (wine-cachyos), and Google Antigravity, each behind a kill-switch with nixpkgs fallbacks
 
 ## Repository layout
 
 ```
 .
-├── flake.nix                       # All composition happens here
+├── flake.nix                       # Flake inputs and Cartesian matrix composition
 ├── cp-hwconf.sh                    # Copies the generated hardware-configuration.nix into ./hw
 ├── apps/                           # User-facing packages & services
-│   ├── apps.nix                    #   Main app set, Podman/Flatpak/AppImage, WARP, LocalSend
+│   ├── apps.nix                    #   Main app set, Podman/Flatpak/AppImage, WARP, LocalSend, AI agents
 │   ├── app-extras.nix              #   custom.* toggles + nix-gaming Cachix cache
 │   └── app-fixes.nix               #   Overlays/workarounds (e.g. Kdenlive GSettings crash fix)
 ├── desktop/                        # One module per desktop environment
-│   ├── gnome-desktop.nix
-│   ├── kde-desktop.nix
-│   └── cosmic-desktop.nix
+│   ├── gnome-desktop.nix           #   GNOME + extensions, adw-gtk3, Mission Center
+│   ├── kde-desktop.nix             #   KDE Plasma 6, fcitx5, ksshaskpass
+│   └── cosmic-desktop.nix          #   COSMIC desktop and greeter
 ├── hw/                             # Hardware-specific modules
 │   ├── hardware-configuration.nix  #   Generated at install time (per machine)
 │   ├── device/dell-l3530.nix       #   Dell Latitude 3530 quirks (modprobe, mitigations, hostname)
@@ -32,9 +32,9 @@ Declarative, flake-genericd NixOS configuration. One flake builds every variant:
 │   │   ├── disk-writeback-fix.nix  #   vm.dirty_* tuning against write stalls
 │   │   └── usr-fix.nix             #   bindfs /usr/share/{fonts,icons,themes} for Flatpak/distrobox
 │   └── lang/bn_BD.nix              # Bangla locale + OpenBangla IME (ibus & fcitx5)
-└── system/                         # Everything that makes a bootable generic system
-    ├── base.nix                    #   Limine + Secure Boot, Nix settings, fonts, locale, OOM, fprintd
-    ├── base-desktop.nix            #   Desktop-agnostic layer: PipeWire, Bluetooth, printing, Plymouth
+└── system/                         # Core system configurations
+    ├── base.nix                    #   Limine + Secure Boot, Nix settings, fonts, locale, OOM, fprintd, packages
+    ├── base-desktop.nix            #   Desktop-agnostic layer: PipeWire, Bluetooth, printing, Plymouth, input-remapper
     ├── disko.nix                   #   Declarative partitioning (DESTROYS the target disk)
     ├── tpm2.nix                    #   TPM2 tooling
     ├── users.nix                   #   User accounts (fish for main user, zsh for guest)
@@ -43,40 +43,43 @@ Declarative, flake-genericd NixOS configuration. One flake builds every variant:
 
 ## How the flake is composed
 
-`flake.nix` assembles configurations from layered module lists, then generates every combination automatically.
+`flake.nix` assembles configurations by combining layered module lists and generating every combination via `lib.mapCartesianProduct`.
 
 | Piece | Contents |
 |---|---|
-| `inputs` | `nixpkgs` (nixos-26.05), `disko`, `nix-flatpak`, `zen-browser`, `nix-gaming` |
-| `hwModule` | `hardwareConfiguration` (generated file), `extra` (fingerprint reader), `dell-l3530` (device + Intel GPU) |
+| `inputs` | `nixpkgs` (nixos-26.05), `disko`, `nix-flatpak`, `zen-browser-flake`, `nix-gaming`, `antigravity-nix` |
+| `hwModule` | `hardwareConfiguration` (machine-generated), `extra` (CS9711 fingerprint reader), `dell-l3530` (device + Intel GPU) |
+| `hostModule` | `generic` (`hardwareConfiguration` only), `dell-l3530` (`hardwareConfiguration` + `dell-l3530` + `extra`) |
 | `langModule` | `bn_BD` Bangla locale/IME support |
 | `inputsModule` | External NixOS modules: disko, nix-flatpak |
-| `baseModule` | hw + inputs + `system/*` → a complete headless system |
-| `desktopModule` | `commonDesktopModules` (`generic-desktop.nix`, `apps/*`, `usr-fix.nix`) + one DE module. `desktop` is an alias for `gnome`; `nogui` adds nothing |
-| `mkSystem` | Thin wrapper over `lib.nixosSystem`, injecting `inputs` via `specialArgs` |
+| `baseModule` | `inputsModule` + `system/*` + `disk-writeback-fix.nix` |
+| `baseSystem` | `baseModule` + `langModule.bn_BD` |
+| `desktopModule` | `commonDesktopModules` (`base-desktop.nix`, `apps/*`, `usr-fix.nix`) + one DE module (`gnome`, `kde`, `cosmic`). `desktop` is an alias for `gnome`; `nogui` adds nothing |
+| `nixosConfigurations` | Generated via `lib.mapCartesianProduct` over `host` × `desktop` pairs |
 
-`lib.concatMapAttrs` maps over `desktopModule` and emits two families of configurations:
+Cartesian product outputs (`<host>-<variant>`):
 
 | Flake output | What you get |
 |---|---|
 | `generic-nogui` | Headless generic system |
-| `generic-desktop` | generic + GNOME (the `desktop` alias) |
-| `generic-gnome` / `generic-kde` / `generic-cosmic` | generic + that desktop |
-| `dell-l3530-<variant>` | Any of the above, plus Dell Latitude 3530 quirks (hostname `dell-nixos`, i915/iwlwifi tuning) |
+| `generic-desktop` | generic + GNOME (default desktop alias) |
+| `generic-gnome` / `generic-kde` / `generic-cosmic` | generic + that desktop environment |
+| `dell-l3530-<variant>` | Any of the above, plus Dell Latitude 3530 hardware quirks (hostname `dell-nixos`, i915/iwlwifi tuning, CS9711 fprint) |
 
 Notes on inputs:
 
-- `disko`, `nix-flatpak` and `zen-browser` all `follows` the system `nixpkgs`.
+- `disko`, `nix-flatpak`, `zen-browser-flake`, and `antigravity-nix` all follow the system `nixpkgs`.
 - `nix-gaming` deliberately does **not** follow — it keeps its own nixpkgs pin so its packages come precompiled from its Cachix cache. Adding `follows` forces source builds (see the comment in `flake.nix`).
 
 ## App toggles
 
-`apps/app-extras.nix` defines two kill-switches (both default `true`), flipped in `apps/apps.nix`:
+`apps/app-extras.nix` defines custom kill-switches (all default `true`), evaluated in `apps/apps.nix`:
 
 | Option | When `true` | When `false` |
 |---|---|---|
-| `custom.zen-browser.enable` | Zen Browser from its flake | `pkgs.firefox` fallback |
+| `custom.zen-browser-flake.enable` | Zen Browser from its flake (`inputs.zen-browser-flake`) | `pkgs.firefox` fallback |
 | `custom.nix-gaming.enable` | `wine-cachyos` + `winetricks-git` from nix-gaming, plus the `WINE_BIN` workaround for winetricks arch/WoW64 detection (NixOS/nixpkgs#338367) | `pkgs.wineWow64Packages.staging` + `pkgs.winetricks` |
+| `custom.antigravity-nix.enable` | `google-antigravity-no-fhs` + `google-antigravity-cli` from `inputs.antigravity-nix` | `pkgs.crush` terminal agent fallback |
 
 > **First-boot note (Cachix):** on the very first rebuild with nix-gaming, set `custom.nix-gaming.enable = false`, rebuild and reboot so the Cachix substituter and trusted key from `app-extras.nix` become active, then set it back to `true` and rebuild again. Otherwise the nix-gaming packages compile from source.
 
@@ -113,7 +116,7 @@ Notes on inputs:
 
 ## Secure Boot (Limine + sbctl)
 
-`system/generic.nix` enables Limine with `secureBoot.enable`, `autoGenerateKeys` and `autoEnrollKeys` (with `--microsoft --firmware-builtin`), plus config-checksum enrollment (`enrollConfig`, `validateChecksums`, `panicOnChecksumMismatch`). Keys are created and enrolled automatically — no manual `sbctl create-keys` / `enroll-keys` step, and no separate unsigned `-install` configuration is needed anymore.
+`system/base.nix` enables Limine with `secureBoot.enable`, `autoGenerateKeys` and `autoEnrollKeys` (with `--microsoft --firmware-builtin`), plus config-checksum enrollment (`enrollConfig`, `validateChecksums`, `panicOnChecksumMismatch`). Keys are created and enrolled automatically — no manual `sbctl create-keys` / `enroll-keys` step, and no separate unsigned `-install` configuration is needed anymore.
 
 One-time setup:
 
@@ -141,15 +144,27 @@ Skip the passphrase prompt on boot by sealing the LUKS key against TPM2 PCRs 5+7
 
 Note: PCR 7 binds to the Secure Boot state and keys. If you ever re-enroll or rotate Secure Boot keys, auto-unlock will fail once — unlock with the passphrase and re-enroll (`systemd-cryptenroll --wipe-slot=tpm2` first, then repeat the command above).
 
-## Creating new deployments
+## Verification and Deployment
 
-Iterate and deploy with:
+### Non-destructive checks (CI / Development / Agents)
+Verify configuration evaluation without switching or altering system state:
+```sh
+nix flake check path:.
+```
+Or build a specific configuration non-destructively:
+```sh
+nixos-rebuild build --flake path:$PWD#<config>
+```
 
+### Deploying changes
+Deploy active configuration to the system:
 ```sh
 sudo nixos-rebuild switch --flake path:$PWD#generic-desktop
 ```
+> Note: We use `path:$PWD` (or `path:.`) so Nix can read files not tracked by Git (such as `hw/hardware-configuration.nix`).
 
-For a new machine: add `hw/device/<name>.nix` (plus GPU/fingerprint modules as needed), wire them into `hwModule` in `flake.nix`, and a full `<name>-{nogui,desktop,gnome,kde,cosmic}` family is generated automatically. Set `networking.hostName` in the device module (the default is `nixos`).
+### Creating new deployments
+For a new machine: add `hw/device/<name>.nix` (plus GPU/fingerprint modules as needed), wire them into `hwModule` and `hostModule` in `flake.nix`, and a full `<name>-{nogui,desktop,gnome,kde,cosmic}` family is generated automatically. Set `networking.hostName` in the device module (the default is `nixos`).
 
 ## Upgrading to a new NixOS release
 
@@ -159,5 +174,5 @@ For a new machine: add `hw/device/<name>.nix` (plus GPU/fingerprint modules as n
    nix flake update
    ```
 3. Read the new release's changelog for breaking changes, then rebuild and reboot.
-4. Once everything checks out, bump `system.stateVersion` in `system/generic.nix` to the new version.
+4. Once everything checks out, bump `system.stateVersion` in `system/base.nix` to the new version.
 5. Rebuild and reboot again.
