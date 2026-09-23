@@ -26,7 +26,11 @@ Declarative, flake-driven NixOS configuration. One flake builds every variant: h
 │   ├── hardware-configuration.nix  #   Generated at install time (per machine)
 │   ├── device/dell-l3530.nix       #   Dell Latitude 3530 quirks (modprobe, mitigations, hostname)
 │   ├── fprint/chipsailing-cs9711.nix # Patched libfprint for the CS9711 fingerprint reader
-│   └── gpu/intel.nix               #   Intel VA-API / compute runtime
+│   └── gpu/
+│       ├── intel.nix               #   Intel VA-API / compute runtime
+│       └── nvidia/
+│           ├── nvidia.nix          #   Unified NVIDIA driver (Turing+, legacy, PRIME auto-offload)
+│           └── nvidia-cuda.nix     #   CUDA acceleration + cache.nixos-cuda.org
 ├── misc/
 │   ├── fixes/
 │   │   ├── disk-writeback-fix.nix  #   vm.dirty_* tuning against write stalls
@@ -82,6 +86,162 @@ Notes on inputs:
 | `custom.antigravity-nix.enable` | `google-antigravity-no-fhs` + `google-antigravity-cli` from `inputs.antigravity-nix` | `pkgs.crush` terminal agent fallback |
 
 > **First-boot note (Cachix):** on the very first rebuild with nix-gaming, set `custom.nix-gaming.enable = false`, rebuild and reboot so the Cachix substituter and trusted key from `app-extras.nix` become active, then set it back to `true` and rebuild again. Otherwise the nix-gaming packages compile from source.
+
+## NVIDIA GPU Support
+
+NVIDIA drivers are organized under `hw/gpu/nvidia/` with modular support for modern desktop cards, legacy pre-Turing architectures, hybrid laptops (PRIME), and CUDA.
+
+### 1. Modern Turing+ Hardware (Default)
+Importing `./hw/gpu/nvidia/nvidia.nix` automatically configures:
+- Open-source kernel modules (`hardware.nvidia.open = true`) for Turing (RTX 20xx / GTX 16xx) and newer GPUs.
+- Modesetting enabled (`modesetting.enable = true`), ensuring Wayland compositors (GNOME, KDE Plasma 6, COSMIC) work smoothly.
+- Systemd power management (`powerManagement.enable = true`) to prevent black screens after sleep/suspend.
+- Full 32-bit graphics libraries (`hardware.graphics.enable32Bit = true`) for Steam and Wine/Proton.
+- Hardware video decoding via `pkgs.nvidia-vaapi-driver` in `hardware.graphics.extraPackages`.
+
+### 2. Pre-Turing Legacy Hardware Switches
+Older architectures cannot run the open-source kernel modules. Simply set these options in your device module (e.g. `hw/device/<machine>.nix`):
+
+- **Pascal (GTX 10xx, MX150–MX350) & Maxwell (GTX 9xx, GTX 750/750Ti)**:
+  ```nix
+  hardware.nvidia.open = false; # Use proprietary closed kernel driver
+  ```
+- **Kepler (GTX 6xx / 7xx)**:
+  ```nix
+  hardware.nvidia.open = false;
+  hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.legacy_470;
+  # Pin to LTS kernel if legacy drivers fail to compile on bleeding-edge kernels:
+  boot.kernelPackages = pkgs.linuxPackages_6_6;
+  ```
+- **Fermi (GTX 4xx / 5xx)**:
+  ```nix
+  hardware.nvidia.open = false;
+  hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.legacy_390;
+  boot.kernelPackages = pkgs.linuxPackages_6_1;
+  ```
+
+### 3. Dual-GPU Hybrid Laptops (Optimus / PRIME)
+For dual-GPU laptops (Intel/AMD iGPU + NVIDIA dGPU), the module automatically activates PRIME offload and power management once you supply your PCI Bus IDs:
+
+1. Locate your GPU Bus IDs:
+   ```sh
+   lspci | grep -E "VGA|3D"
+   ```
+   Example output:
+   ```
+   00:02.0 VGA compatible controller: Intel Corporation ...
+   01:00.0 3D controller: NVIDIA Corporation ...
+   ```
+2. Convert hex bus numbers to decimal (`00:02.0` → `PCI:0:2:0`, `01:00.0` → `PCI:1:0:0`, `0a:00.0` → `PCI:10:0:0`).
+3. Add them to your `hw/device/<machine>.nix`:
+   ```nix
+   hardware.nvidia.prime = {
+     intelBusId = "PCI:0:2:0";  # Or amdgpuBusId = "PCI:4:0:0";
+     nvidiaBusId = "PCI:1:0:0";
+   };
+   ```
+   - **Auto-Offload:** When `nvidiaBusId` is set, `prime.offload.enable = true` is activated automatically.
+   - **`prime-run`:** Heavy 3D or compute workloads can be dispatched on demand via `prime-run <command>` (e.g. `prime-run steam`).
+   - **Power Savings:** The dGPU is powered down via PCIe Runtime D3 (`finegrained = true`) when idle.
+   - **Sync Mode Override:** If display outputs are wired directly to the dGPU, switch to always-on sync mode by adding `hardware.nvidia.prime.sync.enable = true;`.
+
+### 4. CUDA Acceleration & Binary Cache
+To enable CUDA acceleration without triggering widespread local compilations of uncached packages, import `./hw/gpu/nvidia/nvidia-cuda.nix`. This configures:
+- Binary cache substituter: `https://cache.nixos-cuda.org`
+- Public trusted key: `cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M=`
+- `nixpkgs.config.cudaSupport = true;`
+
+## Adding New Hardware & Hosts
+
+Adding a new machine to this repository is fully modular. Follow these steps to generate hardware definitions, configure device quirks, and expose the machine in `flake.nix`:
+
+### Step 1: Generate `hardware-configuration.nix`
+On the target machine (either from the LiveISO or an installed system):
+```sh
+# Filesystems are handled declaratively by disko, so omit filesystems:
+sudo nixos-generate-config --no-filesystems --show-hardware-config > hw/hardware-configuration.nix
+```
+*(If managing multiple distinct machines, you can name it per-machine, e.g. `hw/hwconf-<name>.nix`).*
+
+### Step 2: Create the Device Module (`hw/device/<name>.nix`)
+Create `hw/device/<name>.nix` to house machine-specific quirks, hostname, kernel parameters, and hardware overrides:
+
+```nix
+# hw/device/thinkpad-x1.nix
+{ config, pkgs, ... }:
+
+{
+  # 1. Hostname
+  networking.hostName = "thinkpad-nixos";
+
+  # 2. Kernel parameters and hardware mitigations
+  boot.kernelParams = [ "mitigations=off" ];
+
+  # 3. Hardware-specific modprobe optimizations
+  boot.extraModprobeConfig = ''
+    options iwlwifi power_save=Y power_level=5
+  '';
+
+  # 4. Hybrid GPU Bus IDs (if equipped with dual-GPU / PRIME)
+  # hardware.nvidia.prime = {
+  #   intelBusId = "PCI:0:2:0";
+  #   nvidiaBusId = "PCI:1:0:0";
+  # };
+}
+```
+
+### Step 3: Wire into `flake.nix`
+Open `flake.nix` and connect your new device module and hardware components:
+
+1. **Add to `hwModule`**:
+   Group your device module with its required GPU or peripheral definitions:
+   ```nix
+   hwModule = {
+     hardwareConfiguration = [ ./hw/hardware-configuration.nix ];
+     extra = [ ./hw/fprint/chipsailing-cs9711.nix ];
+
+     # Existing Dell Latitude 3530
+     dell-l3530 = [
+       ./hw/device/dell-l3530.nix
+       ./hw/gpu/intel.nix
+     ];
+
+     # New machine (e.g. ThinkPad with NVIDIA)
+     thinkpad-x1 = [
+       ./hw/device/thinkpad-x1.nix
+       ./hw/gpu/nvidia/nvidia.nix # Attach the NVIDIA driver module
+     ];
+   };
+   ```
+
+2. **Add to `hostModule`**:
+   Define the complete host profile by combining the hardware configuration with the device modules:
+   ```nix
+   hostModule = {
+     generic = hwModule.hardwareConfiguration;
+     dell-l3530 = hwModule.hardwareConfiguration ++ hwModule.dell-l3530 ++ hwModule.extra;
+     thinkpad-x1 = hwModule.hardwareConfiguration ++ hwModule.thinkpad-x1;
+   };
+   ```
+
+### Step 4: Automatic Cartesian Matrix Output
+Because `flake.nix` uses `lib.mapCartesianProduct` over `host` × `desktop`, adding `thinkpad-x1` to `hostModule` automatically generates the complete family of install targets:
+- `thinkpad-x1-nogui` (headless)
+- `thinkpad-x1-desktop` (GNOME default alias)
+- `thinkpad-x1-gnome`
+- `thinkpad-x1-kde`
+- `thinkpad-x1-cosmic`
+
+### Step 5: Test and Deploy
+Verify configuration evaluation non-destructively:
+```sh
+nix flake check path:.
+nixos-rebuild build --flake path:$PWD#thinkpad-x1-desktop
+```
+Deploy to the target machine:
+```sh
+sudo nixos-rebuild switch --flake path:$PWD#thinkpad-x1-desktop
+```
 
 ## Installation
 
@@ -162,9 +322,6 @@ Deploy active configuration to the system:
 sudo nixos-rebuild switch --flake path:$PWD#generic-desktop
 ```
 > Note: We use `path:$PWD` (or `path:.`) so Nix can read files not tracked by Git (such as `hw/hardware-configuration.nix`).
-
-### Creating new deployments
-For a new machine: add `hw/device/<name>.nix` (plus GPU/fingerprint modules as needed), wire them into `hwModule` and `hostModule` in `flake.nix`, and a full `<name>-{nogui,desktop,gnome,kde,cosmic}` family is generated automatically. Set `networking.hostName` in the device module (the default is `nixos`).
 
 ## Upgrading to a new NixOS release
 
