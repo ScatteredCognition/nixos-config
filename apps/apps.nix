@@ -18,6 +18,29 @@
   custom = {
     # zen-browser.enable = true;
     # nix-gaming.enable = false;
+
+    # Antigravity /browser integration settings (defaults to Google Chrome in app-extras.nix):
+    # Google Chrome (default):
+    #   antigravity-nix.browserPackage = pkgs.google-chrome;
+    #   antigravity-nix.devToolsActivePort = "%h/.config/google-chrome/DevToolsActivePort";
+    #
+    # Alternative browser presets:
+    # Chromium (with Widevine):
+    #   antigravity-nix.browserPackage = pkgs.chromium.override { enableWideVine = true; };
+    #   antigravity-nix.devToolsActivePort = "%h/.config/chromium/DevToolsActivePort";
+    # Brave:
+    #   antigravity-nix.browserPackage = pkgs.brave;
+    #   antigravity-nix.devToolsActivePort = "%h/.config/BraveSoftware/Brave-Browser/DevToolsActivePort";
+    # Vivaldi:
+    #   antigravity-nix.browserPackage = pkgs.vivaldi;
+    #   antigravity-nix.devToolsActivePort = "%h/.config/vivaldi/DevToolsActivePort";
+    # Ungoogled Chromium:
+    #   antigravity-nix.browserPackage = pkgs.ungoogled-chromium;
+    #   antigravity-nix.devToolsActivePort = "%h/.config/chromium/DevToolsActivePort";
+    #
+    # Active browser override (currently using standard Chromium):
+    antigravity-nix.browserPackage = pkgs.chromium;
+    antigravity-nix.devToolsActivePort = "%h/.config/chromium/DevToolsActivePort";
   };
 
   # workaround for NixOS/nixpkgs#338367: point winetricks at the real
