@@ -111,10 +111,14 @@
     # AI agents
     ++ (
       if (config.custom.antigravity-nix.enable or false) then
-        (with inputs.antigravity-nix.packages.${pkgs.stdenv.hostPlatform.system}; [
-          google-antigravity-no-fhs
-          google-antigravity-cli
-        ])
+        (
+          with inputs.antigravity-nix.packages.${pkgs.stdenv.hostPlatform.system};
+          [
+            google-antigravity-no-fhs
+            google-antigravity-cli
+          ]
+          ++ [ pkgs.antigravity-acp ]
+        )
       else
         [ pkgs.crush ] # terminal AI agent fallback
     )
@@ -131,6 +135,16 @@
       pkgs.podman-compose
       pkgs.docker-compose
     ]
+
+    # Distrobox gui
+    ++ (
+      if config.services.desktopManager.gnome.enable then
+        # For GNOME
+        [ pkgs.distroshelf ]
+      else
+        # Everything else
+        [ pkgs.kontainer ]
+    )
 
     # Misc CLI
     ++ [
