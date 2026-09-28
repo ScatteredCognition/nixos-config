@@ -117,7 +117,6 @@
             google-antigravity-no-fhs
             google-antigravity-cli
           ]
-          ++ [ pkgs.antigravity-acp ]
         )
       else
         [ pkgs.crush ] # terminal AI agent fallback
