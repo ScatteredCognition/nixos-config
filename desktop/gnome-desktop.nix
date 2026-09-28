@@ -149,20 +149,20 @@
         };
 
         # Defines the properties of the new LibreOffice folder
-        "org/gnome/desktop/app-folders/folders/LibreOffice" = {
-          name = "LibreOffice";
-          translate = false;
-          # Groups all system-installed LibreOffice applications
-          apps = [
-            "startcenter.desktop"
-            "writer.desktop"
-            "calc.desktop"
-            "impress.desktop"
-            "draw.desktop"
-            "base.desktop"
-            "math.desktop"
-          ];
-        };
+        # "org/gnome/desktop/app-folders/folders/LibreOffice" = {
+        #   name = "LibreOffice";
+        #   translate = false;
+        #   # Groups all system-installed LibreOffice applications
+        #   apps = [
+        #     "startcenter.desktop"
+        #     "writer.desktop"
+        #     "calc.desktop"
+        #     "impress.desktop"
+        #     "draw.desktop"
+        #     "base.desktop"
+        #     "math.desktop"
+        #   ];
+        # };
       };
     }
   ];

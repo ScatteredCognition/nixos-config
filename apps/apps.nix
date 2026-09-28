@@ -84,6 +84,7 @@
     # Essentials + Emulation
     ++ [
       pkgs.zed-editor
+      pkgs.onlyoffice-desktopeditors
       pkgs.vlc
       pkgs.qbittorrent
       pkgs.naps2
@@ -105,19 +106,6 @@
           pkgs.wineWow64Packages.staging
           pkgs.winetricks
         ]
-    )
-
-    # Conditional statement to install GTK/Qt variants depending on whether GNOME is installed
-    ++ (
-      if config.services.desktopManager.gnome.enable then
-        # Install if GNOME installed
-        [
-          pkgs.libreoffice-fresh
-        ]
-
-      else
-        # Install if GNOME isn't installed
-        [ pkgs.libreoffice-qt6-fresh ]
     )
 
     # AI agents
