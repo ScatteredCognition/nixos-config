@@ -41,7 +41,7 @@
             // {
               extraBwrapArgs = (prev.onlyoffice-desktopeditors.passthru.args.extraBwrapArgs or [ ]) ++ [
                 "--ro-bind"
-                "/usr/share/fonts"
+                "/usr/share/fonts" # If you only enabled fontDir.enable = true; add /run/current-system/sw/share/X11/fonts instead
                 "/usr/share/fonts"
               ];
             }

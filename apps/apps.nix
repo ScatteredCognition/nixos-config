@@ -49,7 +49,7 @@
   environment.sessionVariables =
     if (config.custom.nix-gaming.enable or false) then
       let
-        wine = inputs.nix-gaming.packages.${pkgs.stdenv.hostPlatform.system}.wine-cachyos;
+        wine = inputs.nix-gaming.packages.${pkgs.stdenv.hostPlatform.system}.wine-tkg;
       in
       {
         WINE_BIN = "${wine}/bin/.wine";
@@ -98,7 +98,7 @@
     ++ (
       if (config.custom.nix-gaming.enable or false) then
         (with inputs.nix-gaming.packages.${pkgs.stdenv.hostPlatform.system}; [
-          wine-cachyos
+          wine-tkg
           winetricks-git
         ])
       else

@@ -6,7 +6,7 @@ Declarative, flake-driven NixOS configuration. One flake builds every variant: h
 - **Channel:** `nixos-26.05`
 - **Bootloader:** Limine with Secure Boot signing and automatic sbctl key management
 - **Disk:** disko-managed GPT → LUKS → btrfs (`@root`, `@home`, `@nix`), optional TPM2 auto-unlock
-- **Flake apps:** Zen Browser, nix-gaming (wine-cachyos), and Google Antigravity, each behind a kill-switch with nixpkgs fallbacks
+- **Flake apps:** Zen Browser, nix-gaming (wine-tkg), and Google Antigravity, each behind a kill-switch with nixpkgs fallbacks
 
 ## Repository layout
 
@@ -82,7 +82,7 @@ Notes on inputs:
 | Option | When `true` | When `false` |
 |---|---|---|
 | `custom.zen-browser-flake.enable` | Zen Browser from its flake (`inputs.zen-browser-flake`) | `pkgs.firefox` fallback |
-| `custom.nix-gaming.enable` | `wine-cachyos` + `winetricks-git` from nix-gaming, plus the `WINE_BIN` workaround for winetricks arch/WoW64 detection (NixOS/nixpkgs#338367) | `pkgs.wineWow64Packages.staging` + `pkgs.winetricks` |
+| `custom.nix-gaming.enable` | `wine-tkg` + `winetricks-git` from nix-gaming, plus the `WINE_BIN` workaround for winetricks arch/WoW64 detection (NixOS/nixpkgs#338367) | `pkgs.wineWow64Packages.staging` + `pkgs.winetricks` |
 | `custom.antigravity-nix.enable` | `google-antigravity-no-fhs` + `google-antigravity-cli` from `inputs.antigravity-nix` | `pkgs.crush` terminal agent fallback |
 
 > **First-boot note (Cachix):** on the very first rebuild with nix-gaming, set `custom.nix-gaming.enable = false`, rebuild and reboot so the Cachix substituter and trusted key from `app-extras.nix` become active, then set it back to `true` and rebuild again. Otherwise the nix-gaming packages compile from source.
