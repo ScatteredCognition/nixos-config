@@ -16,31 +16,9 @@
   # Set nix-gaming.enable to false during first rebuild after enabling cachix
   # Then do a reboot, set it to true, rebuild once more for the cachix cache to be active
   custom = {
-    # zen-browser.enable = true;
+    # zen-browser-flake.enable = true;
     # nix-gaming.enable = false;
-
-    # Antigravity /browser integration settings (defaults to Google Chrome in app-extras.nix):
-    # Google Chrome (default):
-    #   antigravity-nix.browserPackage = pkgs.google-chrome;
-    #   antigravity-nix.devToolsActivePort = "%h/.config/google-chrome/DevToolsActivePort";
-    #
-    # Alternative browser presets:
-    # Chromium (with Widevine):
-    #   antigravity-nix.browserPackage = pkgs.chromium.override { enableWideVine = true; };
-    #   antigravity-nix.devToolsActivePort = "%h/.config/chromium/DevToolsActivePort";
-    # Brave:
-    #   antigravity-nix.browserPackage = pkgs.brave;
-    #   antigravity-nix.devToolsActivePort = "%h/.config/BraveSoftware/Brave-Browser/DevToolsActivePort";
-    # Vivaldi:
-    #   antigravity-nix.browserPackage = pkgs.vivaldi;
-    #   antigravity-nix.devToolsActivePort = "%h/.config/vivaldi/DevToolsActivePort";
-    # Ungoogled Chromium:
-    #   antigravity-nix.browserPackage = pkgs.ungoogled-chromium;
-    #   antigravity-nix.devToolsActivePort = "%h/.config/chromium/DevToolsActivePort";
-    #
-    # Active browser override (currently using standard Chromium):
-    antigravity-nix.browserPackage = pkgs.chromium;
-    antigravity-nix.devToolsActivePort = "%h/.config/chromium/DevToolsActivePort";
+    # antigravity-nix.enable = false;
   };
 
   # workaround for NixOS/nixpkgs#338367: point winetricks at the real
@@ -109,15 +87,16 @@
     )
 
     # AI agents
+    ++ [ pkgs.snip ]
     ++ (
       if (config.custom.antigravity-nix.enable or false) then
-        (
-          with inputs.antigravity-nix.packages.${pkgs.stdenv.hostPlatform.system};
-          [
-            google-antigravity-no-fhs
-            google-antigravity-cli
-          ]
-        )
+        (with inputs.antigravity-nix.packages.${pkgs.stdenv.hostPlatform.system}; [
+          (google-antigravity-no-fhs.override {
+            browserPkg = pkgs.chromium;
+            # browserProfileDir = "$HOME/.config/chromium";
+          })
+          google-antigravity-cli
+        ])
       else
         [ pkgs.crush ] # terminal AI agent fallback
     )

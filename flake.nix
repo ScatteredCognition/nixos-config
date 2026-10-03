@@ -94,6 +94,7 @@
 
           # dirty cache writeback fix
           ./misc/fixes/disk-writeback-fix.nix
+          ./misc/tweaks.nix
         ];
 
       # base-desktop
