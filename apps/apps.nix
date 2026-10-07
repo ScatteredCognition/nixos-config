@@ -87,7 +87,10 @@
     )
 
     # AI agents
-    ++ [ pkgs.snip ]
+    ++ [
+      pkgs.python3
+      pkgs.nodejs
+    ] # All AI agents eventually need python and node
     ++ (
       if (config.custom.antigravity-nix.enable or false) then
         (with inputs.antigravity-nix.packages.${pkgs.stdenv.hostPlatform.system}; [
@@ -129,6 +132,7 @@
       pkgs.wl-clipboard
       pkgs.yt-dlp
       pkgs.aria2
+      pkgs.android-tools
     ];
 
   # Cloudflare WARP

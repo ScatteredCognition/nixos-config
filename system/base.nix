@@ -158,7 +158,6 @@
     pkgs.tree
     pkgs.nix-tree
     pkgs.home-manager
-    pkgs.android-tools
   ]
 
   # Needed for lanzaboot
