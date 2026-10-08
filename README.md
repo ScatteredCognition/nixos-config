@@ -1,5 +1,5 @@
 # nixos-config
-**Last edited: 23-09-2026 (git commit 2cffb9cefd3936fbdf73d532b2a6831090b4d5de)**
+**Last edited: 08-10-2026 (git commit afd2b878b677deb7e52e5037cf474f01abd06628)**
 
 Declarative, flake-driven NixOS configuration. One flake builds every variant: headless or desktop (GNOME / KDE Plasma / COSMIC), generic or device-specific (currently a Dell Latitude 3530).
 
@@ -17,14 +17,14 @@ Declarative, flake-driven NixOS configuration. One flake builds every variant: h
 ├── apps/                           # User-facing packages & services
 │   ├── apps.nix                    #   Main app set, Podman/Flatpak/AppImage, WARP, LocalSend, AI agents
 │   ├── app-extras.nix              #   custom.* toggles + nix-gaming Cachix cache
-│   └── app-fixes.nix               #   Overlays/workarounds (e.g. Kdenlive GSettings crash fix)
+│   └── app-fixes.nix               #   Overlays/workarounds (Kdenlive GSettings crash, OnlyOffice font bind)
 ├── desktop/                        # One module per desktop environment
 │   ├── gnome-desktop.nix           #   GNOME + extensions, adw-gtk3, Mission Center
 │   ├── kde-desktop.nix             #   KDE Plasma 6, fcitx5, ksshaskpass
 │   └── cosmic-desktop.nix          #   COSMIC desktop and greeter
 ├── hw/                             # Hardware-specific modules
 │   ├── hardware-configuration.nix  #   Generated at install time (per machine)
-│   ├── device/dell-l3530.nix       #   Dell Latitude 3530 quirks (modprobe, mitigations, hostname)
+│   ├── device/dell-l3530.nix       #   Dell Latitude 3530 device module (hostname)
 │   ├── fprint/chipsailing-cs9711.nix # Patched libfprint for the CS9711 fingerprint reader
 │   └── gpu/
 │       ├── intel.nix               #   Intel VA-API / compute runtime
@@ -35,6 +35,7 @@ Declarative, flake-driven NixOS configuration. One flake builds every variant: h
 │   ├── fixes/
 │   │   ├── disk-writeback-fix.nix  #   vm.dirty_* tuning against write stalls
 │   │   └── usr-fix.nix             #   bindfs /usr/share/{fonts,icons,themes} for Flatpak/distrobox
+│   ├── karg-tweaks.nix             #   Global kernel params (mitigations off, i915/iwlwifi power tuning)
 │   └── lang/bn_BD.nix              # Bangla locale + OpenBangla IME (ibus & fcitx5)
 └── system/                         # Core system configurations
     ├── base.nix                    #   Limine + Secure Boot, Nix settings, fonts, locale, OOM, fprintd, packages
@@ -51,12 +52,12 @@ Declarative, flake-driven NixOS configuration. One flake builds every variant: h
 
 | Piece | Contents |
 |---|---|
-| `inputs` | `nixpkgs` (nixos-26.05), `disko`, `nix-flatpak`, `zen-browser-flake`, `nix-gaming`, `antigravity-nix` |
+| `inputs` | `nixpkgs` (nixos-26.05), `disko`, `nix-flatpak`, `zen-browser-flake`, `nix-gaming`, `antigravity-nix`, `opencode` |
 | `hwModule` | `hardwareConfiguration` (machine-generated), `extra` (CS9711 fingerprint reader), `dell-l3530` (device + Intel GPU) |
 | `hostModule` | `generic` (`hardwareConfiguration` only), `dell-l3530` (`hardwareConfiguration` + `dell-l3530` + `extra`) |
 | `langModule` | `bn_BD` Bangla locale/IME support |
 | `inputsModule` | External NixOS modules: disko, nix-flatpak |
-| `baseModule` | `inputsModule` + `system/*` + `disk-writeback-fix.nix` |
+| `baseModule` | `inputsModule` + `system/*` + `disk-writeback-fix.nix` + `karg-tweaks.nix` |
 | `baseSystem` | `baseModule` + `langModule.bn_BD` |
 | `desktopModule` | `commonDesktopModules` (`base-desktop.nix`, `apps/*`, `usr-fix.nix`) + one DE module (`gnome`, `kde`, `cosmic`). `desktop` is an alias for `gnome`; `nogui` adds nothing |
 | `nixosConfigurations` | Generated via `lib.mapCartesianProduct` over `host` × `desktop` pairs |
@@ -68,7 +69,7 @@ Cartesian product outputs (`<host>-<variant>`):
 | `generic-nogui` | Headless generic system |
 | `generic-desktop` | generic + GNOME (default desktop alias) |
 | `generic-gnome` / `generic-kde` / `generic-cosmic` | generic + that desktop environment |
-| `dell-l3530-<variant>` | Any of the above, plus Dell Latitude 3530 hardware quirks (hostname `dell-nixos`, i915/iwlwifi tuning, CS9711 fprint) |
+| `dell-l3530-<variant>` | Any of the above, plus Dell Latitude 3530 device module (hostname `dell-nixos`, CS9711 fprint). i915/iwlwifi tuning is global via `misc/karg-tweaks.nix` |
 
 Notes on inputs:
 
@@ -83,8 +84,8 @@ Notes on inputs:
 |---|---|---|
 | `custom.zen-browser-flake.enable` | Zen Browser from its flake (`inputs.zen-browser-flake`) | `pkgs.firefox` fallback |
 | `custom.nix-gaming.enable` | `wine-tkg` + `winetricks-git` from nix-gaming, plus the `WINE_BIN` workaround for winetricks arch/WoW64 detection (NixOS/nixpkgs#338367) | `pkgs.wineWow64Packages.staging` + `pkgs.winetricks` |
-| `custom.antigravity-nix.enable` | `google-antigravity-no-fhs` + `google-antigravity-cli` from `inputs.antigravity-nix` | `pkgs.crush` terminal agent fallback |
-| `custom.opencode.enable` | `opencode` + `opencode-desktop` from upstream flake (`inputs.opencode`) | `pkgs.opencode` + `pkgs.opencode-desktop` fallback |
+| `custom.antigravity-nix.enable` | `google-antigravity-no-fhs` (with `browserPkg = pkgs.chromium`) + `google-antigravity-cli` from `inputs.antigravity-nix` | No fallback — OpenCode covers the terminal-agent case |
+| `custom.opencode.enable` | `opencode` + `opencode-desktop` from upstream flake (`inputs.opencode`, follows `nixpkgs` but ships no binary cache, so it builds from source) | `pkgs.opencode` + `pkgs.opencode-desktop` fallback |
 
 > **First-boot note (Cachix):** on the very first rebuild with nix-gaming, set `custom.nix-gaming.enable = false`, rebuild and reboot so the Cachix substituter and trusted key from `app-extras.nix` become active, then set it back to `true` and rebuild again. Otherwise the nix-gaming packages compile from source.
 
