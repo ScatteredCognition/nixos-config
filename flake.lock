@@ -222,6 +222,26 @@
         "type": "github"
       }
     },
+    "opencode": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1791439826,
+        "narHash": "sha256-Nw23MgaCv/SDmzk42Pv8S7xiM9552ceiGd4TK1SotBQ=",
+        "owner": "anomalyco",
+        "repo": "opencode",
+        "rev": "5d9cd9b259f0456522f318a7435501d03cfbee79",
+        "type": "github"
+      },
+      "original": {
+        "owner": "anomalyco",
+        "repo": "opencode",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "antigravity-nix": "antigravity-nix",
@@ -229,6 +249,7 @@
         "nix-flatpak": "nix-flatpak",
         "nix-gaming": "nix-gaming",
         "nixpkgs": "nixpkgs_2",
+        "opencode": "opencode",
         "zen-browser-flake": "zen-browser-flake"
       }
     },

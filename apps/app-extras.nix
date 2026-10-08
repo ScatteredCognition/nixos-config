@@ -24,6 +24,10 @@
     antigravity-nix.enable = lib.mkEnableOption "antigravity-nix (precompiled)" // {
       default = true;
     };
+    # opencode
+    opencode.enable = lib.mkEnableOption "upstream opencode flake (needs to compile from source)" // {
+      default = true;
+    };
   };
 
   config = {

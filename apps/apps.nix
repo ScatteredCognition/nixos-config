@@ -19,6 +19,7 @@
     # zen-browser-flake.enable = true;
     # nix-gaming.enable = false;
     # antigravity-nix.enable = false;
+    opencode.enable = false;
   };
 
   # workaround for NixOS/nixpkgs#338367: point winetricks at the real
@@ -101,7 +102,19 @@
           google-antigravity-cli
         ])
       else
-        [ pkgs.crush ] # terminal AI agent fallback
+        [ ] # No need for fallback, we have opencode anyways
+    )
+    ++ (
+      if (config.custom.opencode.enable or false) then
+        (with inputs.opencode.packages.${pkgs.stdenv.hostPlatform.system}; [
+          opencode
+          opencode-desktop
+        ])
+      else
+        [
+          pkgs.opencode
+          pkgs.opencode-desktop
+        ]
     )
 
     # Nix LSP support
