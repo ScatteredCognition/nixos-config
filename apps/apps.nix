@@ -19,7 +19,6 @@
     # zen-browser-flake.enable = true;
     # nix-gaming.enable = false;
     # antigravity-nix.enable = false;
-    opencode.enable = false;
   };
 
   # workaround for NixOS/nixpkgs#338367: point winetricks at the real
@@ -87,35 +86,12 @@
         ]
     )
 
-    # AI agents
+    # Python, node and jq for when you need it
     ++ [
       pkgs.python3
       pkgs.nodejs
-    ] # All AI agents eventually need python and node
-    ++ (
-      if (config.custom.antigravity-nix.enable or false) then
-        (with inputs.antigravity-nix.packages.${pkgs.stdenv.hostPlatform.system}; [
-          (google-antigravity-no-fhs.override {
-            browserPkg = pkgs.chromium;
-            # browserProfileDir = "$HOME/.config/chromium";
-          })
-          google-antigravity-cli
-        ])
-      else
-        [ ] # No need for fallback, we have opencode anyways
-    )
-    ++ (
-      if (config.custom.opencode.enable or false) then
-        (with inputs.opencode.packages.${pkgs.stdenv.hostPlatform.system}; [
-          opencode
-          opencode-desktop
-        ])
-      else
-        [
-          pkgs.opencode
-          pkgs.opencode-desktop
-        ]
-    )
+      pkgs.jq
+    ]
 
     # Nix LSP support
     ++ [

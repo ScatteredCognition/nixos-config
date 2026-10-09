@@ -94,6 +94,7 @@
   ++ [
     pkgs.mission-center
     pkgs.refine
+    pkgs.peazip
   ];
 
   # workaround for NixOS not setting GST PATH variable
