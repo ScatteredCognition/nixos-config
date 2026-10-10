@@ -67,6 +67,12 @@
         ];
       };
 
+      # Hosts, devices to deploy on
+      hostModule = {
+        generic = hwModule.hardwareConfiguration;
+        dell-l3530 = hwModule.hardwareConfiguration ++ hwModule.dell-l3530 ++ hwModule.extra;
+      };
+
       # Language stuff
       langModule = {
         bn_BD = [ ./misc/lang/bn_BD.nix ];
@@ -104,6 +110,7 @@
             ./apps/apps.nix # Apps etc
             ./apps/app-fixes.nix
             ./apps/app-extras.nix
+            ./apps/weylus.nix
             ./misc/fixes/usr-fix.nix # Misc
           ];
         in
@@ -116,12 +123,6 @@
           kde = commonDesktopModules ++ [ ./desktop/kde-desktop.nix ];
           cosmic = commonDesktopModules ++ [ ./desktop/cosmic-desktop.nix ];
         };
-
-      # Hosts, devices to deploy on
-      hostModule = {
-        generic = hwModule.hardwareConfiguration;
-        dell-l3530 = hwModule.hardwareConfiguration ++ hwModule.dell-l3530 ++ hwModule.extra;
-      };
 
       # Define baseSystem, an abstraction over baseModule for ease of use in mkSystem
       baseSystem =
