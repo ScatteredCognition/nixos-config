@@ -110,7 +110,6 @@
             ./apps/apps.nix # Apps etc
             ./apps/app-fixes.nix
             ./apps/app-extras.nix
-            ./apps/weylus.nix
             ./misc/fixes/usr-fix.nix # Misc
           ];
         in
