@@ -27,6 +27,7 @@
 
   # Boot stuff
   boot = {
+    kernelPackages = lib.mkDefault pkgs.linuxPackages; # explicitly set Linux LTS as the default
     loader = {
       # timeout = 0; # Hides boot selector
       efi.canTouchEfiVariables = true; # Allow adding EFI boot entries, modifying NVRAM
@@ -112,6 +113,7 @@
   ## Filesystem maintenance
   services.btrfs.autoScrub = {
     enable = true;
+    interval = "weekly";
   };
 
   ## Clean /tmp on boot
