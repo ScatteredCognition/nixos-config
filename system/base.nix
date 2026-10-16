@@ -111,6 +111,11 @@
   services.fwupd.enable = true;
 
   ## Filesystem maintenance
+  services.fstrim = {
+    enable = true;
+    interval = "weekly";
+  };
+
   services.btrfs.autoScrub = {
     enable = true;
     interval = "weekly";
