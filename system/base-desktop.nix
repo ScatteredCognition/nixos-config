@@ -2,9 +2,9 @@
 
 # base.nix
 {
-  pkgs,
-  config,
-  lib,
+  # pkgs,
+  # config,
+  # lib,
   ...
 }:
 

@@ -3,9 +3,9 @@
 # https://github.com/fufexan/nix-gaming
 
 {
-  config,
+  # config,
+  # pkgs,
   lib,
-  pkgs,
   ...
 }:
 
