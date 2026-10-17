@@ -156,7 +156,7 @@
   programs = {
     fish.enable = true;
     zsh.enable = true;
-    nix-ld.enable = true; # hacky but what can you do
+    # nix-ld.enable = true; # hacky but what can you do
   };
 
   # Extra programs to enable
