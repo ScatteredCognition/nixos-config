@@ -24,17 +24,18 @@
   # workaround for NixOS/nixpkgs#338367: point winetricks at the real
   # (unwrapped) binaries so its arch/WoW64 detection works
   # set wine = to the wine version you are using rn
-  environment.sessionVariables =
-    if (config.custom.nix-gaming.enable or false) then
-      let
-        wine = inputs.nix-gaming.packages.${pkgs.stdenv.hostPlatform.system}.wine-tkg;
-      in
-      {
-        WINE_BIN = "${wine}/bin/.wine";
-        # WINESERVER_BIN = "${wine}/bin/.wineserver";
-      }
-    else
-      { };
+  # Only needed for cachyos wine
+  #environment.sessionVariables =
+  #  if (config.custom.nix-gaming.enable or false) then
+  #    let
+  #      wine = inputs.nix-gaming.packages.${pkgs.stdenv.hostPlatform.system}.wine-cachyos;
+  #    in
+  #    {
+  #      WINE_BIN = "${wine}/bin/.wine";
+  #      # WINESERVER_BIN = "${wine}/bin/.wineserver";
+  #    }
+  #  else
+  #    { };
 
   environment.systemPackages =
 
@@ -89,6 +90,8 @@
     # Python, node and jq for when you need it
     ++ [
       pkgs.python3
+      pkgs.pipx
+      pkgs.uv
       pkgs.nodejs
       pkgs.jq
     ]
