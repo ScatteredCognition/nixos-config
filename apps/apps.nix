@@ -63,7 +63,7 @@
     ++ [
       pkgs.zed-editor
       pkgs.onlyoffice-desktopeditors
-      pkgs.vlc
+      pkgs.cine # VLC is glitchy and buggy
       pkgs.qbittorrent
       pkgs.naps2
       pkgs.foliate
