@@ -42,7 +42,7 @@
       hashedPassword = "";
 
       # User shell
-      shell = pkgs.zsh;
+      # shell = pkgs.fish;
     };
   };
 }
