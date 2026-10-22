@@ -1,9 +1,9 @@
 #!/usr/bin/env sh
 
 if [ -f /etc/nixos/hardware-configuration.nix ]; then
-  cp /etc/nixos/hardware-configuration.nix ./hw/hardware-configuration.nix
+  cp /etc/nixos/hardware-configuration.nix ./hw/device/generic.nix
 elif [ -f /mnt/etc/nixos/hardware-configuration.nix ]; then
-  cp /mnt/etc/nixos/hardware-configuration.nix ./hw/hardware-configuration.nix
+  cp /mnt/etc/nixos/hardware-configuration.nix ./hw/device/generic.nix
 else
   echo "Error: hardware-configuration.nix not found in /etc/nixos/ or /mnt/etc/nixos/" >&2
   echo "Please run sudo nixos-generate-config --root /mnt --no-filesystems"

@@ -7,7 +7,7 @@
   # Inputs
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
-    nixos-hardware.url = "github:ScatteredCognition/nixos-hardware/dell-latitude-3530";
+    nixos-hardware.url = "github:ScatteredCognition/nixos-hardware/dell-latitude-3530"; # Temporary, change to upstream when commit merged
 
     # disko
     disko = {

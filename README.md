@@ -1,31 +1,37 @@
 # nixos-config
-**Last edited: 08-10-2026 (git commit afd2b878b677deb7e52e5037cf474f01abd06628)**
+**Last edited: 23-10-2026**
 
 Declarative, flake-driven NixOS configuration. One flake builds every variant: headless or desktop (GNOME / KDE Plasma / COSMIC), generic or device-specific (currently a Dell Latitude 3530).
 
 - **Channel:** `nixos-26.05`
+- **Kernel:** Linux LTS (`pkgs.linuxPackages`) by default
 - **Bootloader:** Limine with Secure Boot signing and automatic sbctl key management
 - **Disk:** disko-managed GPT → LUKS → btrfs (`@root`, `@home`, `@nix`), optional TPM2 auto-unlock
-- **Flake apps:** Zen Browser, nix-gaming (wine-tkg), Google Antigravity, and OpenCode, each behind a kill-switch with nixpkgs fallbacks
+- **Maintenance:** Automatic weekly `fstrim` and btrfs scrub
+- **Flake apps:** Zen Browser, nix-gaming (wine-tkg), Google Antigravity, and nixos-hardware (Dell Latitude 3530)
 
 ## Repository layout
 
 ```
 .
 ├── flake.nix                       # Flake inputs and Cartesian matrix composition
-├── cp-hwconf.sh                    # Copies the generated hardware-configuration.nix into ./hw
+├── cp-hwconf.sh                    # Copies the generated hardware-configuration.nix into ./hw/device/generic.nix
 ├── apps/                           # User-facing packages & services
-│   ├── apps.nix                    #   Main app set, Podman/Flatpak/AppImage, WARP, LocalSend, AI agents
+│   ├── default.nix                 #   Bundles apps.nix, app-fixes.nix, and app-extras.nix
+│   ├── apps.nix                    #   Main app set, Podman/Flatpak/AppImage, WARP, LocalSend, dev tools
 │   ├── app-extras.nix              #   custom.* toggles + nix-gaming Cachix cache
 │   └── app-fixes.nix               #   Overlays/workarounds (Kdenlive GSettings crash, OnlyOffice font bind)
 ├── desktop/                        # One module per desktop environment
-│   ├── gnome-desktop.nix           #   GNOME + extensions, adw-gtk3, Mission Center
+│   ├── gnome-desktop.nix           #   GNOME + extensions, adw-gtk3, Mission Center, PeaZip
 │   ├── kde-desktop.nix             #   KDE Plasma 6, fcitx5, ksshaskpass
 │   └── cosmic-desktop.nix          #   COSMIC desktop and greeter
 ├── hw/                             # Hardware-specific modules
-│   ├── hardware-configuration.nix  #   Generated at install time (per machine)
-│   ├── device/dell-l3530.nix       #   Dell Latitude 3530 device module (hostname)
-│   ├── fprint/chipsailing-cs9711.nix # Patched libfprint for the CS9711 fingerprint reader
+│   ├── device/
+│   │   ├── generic.nix             #   Generic hardware configuration target (populated via cp-hwconf.sh)
+│   │   └── dell-l3530.nix          #   Dell Latitude 3530 device module (hostname, kernel modules, Intel GPU)
+│   ├── extra/
+│   │   ├── default.nix             #   Bundles extra hardware modules
+│   │   └── chipsailing-cs9711.nix  #   Patched libfprint for the CS9711 fingerprint reader
 │   └── gpu/
 │       ├── intel.nix               #   Intel VA-API / compute runtime
 │       └── nvidia/
@@ -36,13 +42,13 @@ Declarative, flake-driven NixOS configuration. One flake builds every variant: h
 │   │   ├── disk-writeback-fix.nix  #   vm.dirty_* tuning against write stalls
 │   │   └── usr-fix.nix             #   bindfs /usr/share/{fonts,icons,themes} for Flatpak/distrobox
 │   ├── karg-tweaks.nix             #   Global kernel params (mitigations off, i915/iwlwifi power tuning)
-│   └── lang/bn_BD.nix              # Bangla locale + OpenBangla IME (ibus & fcitx5)
+│   └── lang/bn_BD.nix              # Bangla IME (OpenBangla for ibus & fcitx5)
 └── system/                         # Core system configurations
-    ├── base.nix                    #   Limine + Secure Boot, Nix settings, fonts, locale, OOM, fprintd, packages
+    ├── base.nix                    #   Limine + Secure Boot, LTS kernel, Nix settings, fonts, weekly fstrim/scrub
     ├── base-desktop.nix            #   Desktop-agnostic layer: PipeWire, Bluetooth, printing, Plymouth, input-remapper
     ├── disko.nix                   #   Declarative partitioning (DESTROYS the target disk)
     ├── tpm2.nix                    #   TPM2 tooling
-    ├── users.nix                   #   User accounts (fish for main user, zsh for guest)
+    ├── users.nix                   #   User accounts (fish shell, dev tools + Antigravity under main user)
     └── zram.nix                    #   zram swap (zstd, 50% of RAM), no disk swap
 ```
 
@@ -52,14 +58,14 @@ Declarative, flake-driven NixOS configuration. One flake builds every variant: h
 
 | Piece | Contents |
 |---|---|
-| `inputs` | `nixpkgs` (nixos-26.05), `disko`, `nix-flatpak`, `zen-browser-flake`, `nix-gaming`, `antigravity-nix`, `opencode` |
-| `hwModule` | `hardwareConfiguration` (machine-generated), `extra` (CS9711 fingerprint reader), `dell-l3530` (device + Intel GPU) |
-| `hostModule` | `generic` (`hardwareConfiguration` only), `dell-l3530` (`hardwareConfiguration` + `dell-l3530` + `extra`) |
-| `langModule` | `bn_BD` Bangla locale/IME support |
+| `inputs` | `nixpkgs` (nixos-26.05), `nixos-hardware`, `disko`, `nix-flatpak`, `zen-browser-flake`, `nix-gaming`, `antigravity-nix` |
+| `hwModule` | `generic` (`./hw/device/generic.nix`), `dell-l3530` (`nixos-hardware` module + `./hw/device/dell-l3530.nix`), `extra` (`./hw/extra`) |
+| `hostModule` | `generic` (`hwModule.generic`), `dell-l3530` (`hwModule.dell-l3530 ++ hwModule.extra`) |
+| `langModule` | `bn_BD` Bangla IME support (`./misc/lang/bn_BD.nix`) |
 | `inputsModule` | External NixOS modules: disko, nix-flatpak |
 | `baseModule` | `inputsModule` + `system/*` + `disk-writeback-fix.nix` + `karg-tweaks.nix` |
 | `baseSystem` | `baseModule` + `langModule.bn_BD` |
-| `desktopModule` | `commonDesktopModules` (`base-desktop.nix`, `apps/*`, `usr-fix.nix`) + one DE module (`gnome`, `kde`, `cosmic`). `desktop` is an alias for `gnome`; `nogui` adds nothing |
+| `desktopModule` | `commonDesktopModules` (`base-desktop.nix`, `./apps`, `usr-fix.nix`) + one DE module (`gnome`, `kde`, `cosmic`). `desktop` is an alias for `gnome`; `nogui` adds nothing |
 | `nixosConfigurations` | Generated via `lib.mapCartesianProduct` over `host` × `desktop` pairs |
 
 Cartesian product outputs (`<host>-<variant>`):
@@ -69,23 +75,23 @@ Cartesian product outputs (`<host>-<variant>`):
 | `generic-nogui` | Headless generic system |
 | `generic-desktop` | generic + GNOME (default desktop alias) |
 | `generic-gnome` / `generic-kde` / `generic-cosmic` | generic + that desktop environment |
-| `dell-l3530-<variant>` | Any of the above, plus Dell Latitude 3530 device module (hostname `dell-nixos`, CS9711 fprint). i915/iwlwifi tuning is global via `misc/karg-tweaks.nix` |
+| `dell-l3530-<variant>` | Any of the above, plus Dell Latitude 3530 hardware definitions (nixos-hardware, hostname `dell-nixos`, Intel GPU, CS9711 fprint). i915/iwlwifi tuning is global via `misc/karg-tweaks.nix` |
 
 Notes on inputs:
 
-- `disko`, `nix-flatpak`, `zen-browser-flake`, `antigravity-nix`, and `opencode` all follow the system `nixpkgs`.
+- `disko`, `nix-flatpak`, `zen-browser-flake`, and `antigravity-nix` follow the system `nixpkgs`.
+- `nixos-hardware` provides upstream hardware quirks for device models (e.g. Dell Latitude 3530).
 - `nix-gaming` deliberately does **not** follow — it keeps its own nixpkgs pin so its packages come precompiled from its Cachix cache. Adding `follows` forces source builds (see the comment in `flake.nix`).
 
 ## App toggles
 
-`apps/app-extras.nix` defines custom kill-switches (all default `true`), evaluated in `apps/apps.nix`:
+`apps/app-extras.nix` defines custom kill-switches (all default `true`), evaluated in `apps/apps.nix` and `system/users.nix`:
 
 | Option | When `true` | When `false` |
 |---|---|---|
 | `custom.zen-browser-flake.enable` | Zen Browser from its flake (`inputs.zen-browser-flake`) | `pkgs.firefox` fallback |
 | `custom.nix-gaming.enable` | `wine-tkg` + `winetricks-git` from nix-gaming, plus the `WINE_BIN` workaround for winetricks arch/WoW64 detection (NixOS/nixpkgs#338367) | `pkgs.wineWow64Packages.staging` + `pkgs.winetricks` |
-| `custom.antigravity-nix.enable` | `google-antigravity-no-fhs` (with `browserPkg = pkgs.chromium`) + `google-antigravity-cli` from `inputs.antigravity-nix` | No fallback — OpenCode covers the terminal-agent case |
-| `custom.opencode.enable` | `opencode` + `opencode-desktop` from upstream flake (`inputs.opencode`, follows `nixpkgs` but ships no binary cache, so it builds from source) | `pkgs.opencode` + `pkgs.opencode-desktop` fallback |
+| `custom.antigravity-nix.enable` | `google-antigravity-no-fhs` (with `browserPkg = pkgs.chromium`) + `google-antigravity-cli` from `inputs.antigravity-nix` configured under main user (`system/users.nix`) | Antigravity packages omitted from user environment |
 
 > **First-boot note (Cachix):** on the very first rebuild with nix-gaming, set `custom.nix-gaming.enable = false`, rebuild and reboot so the Cachix substituter and trusted key from `app-extras.nix` become active, then set it back to `true` and rebuild again. Otherwise the nix-gaming packages compile from source.
 
@@ -157,22 +163,26 @@ To enable CUDA acceleration without triggering widespread local compilations of 
 
 Adding a new machine to this repository is fully modular. Follow these steps to generate hardware definitions, configure device quirks, and expose the machine in `flake.nix`:
 
-### Step 1: Generate `hardware-configuration.nix`
+### Step 1: Generate Hardware Configuration
 On the target machine (either from the LiveISO or an installed system):
 ```sh
 # Filesystems are handled declaratively by disko, so omit filesystems:
-sudo nixos-generate-config --no-filesystems --show-hardware-config > hw/hardware-configuration.nix
+sudo nixos-generate-config --no-filesystems --show-hardware-config > hw/device/<name>.nix
 ```
-*(If managing multiple distinct machines, you can name it per-machine, e.g. `hw/hwconf-<name>.nix`).*
+*(For a generic host target, running `./cp-hwconf.sh` copies the host's `/etc/nixos/hardware-configuration.nix` or `/mnt/etc/nixos/hardware-configuration.nix` into `hw/device/generic.nix`).*
 
-### Step 2: Create the Device Module (`hw/device/<name>.nix`)
-Create `hw/device/<name>.nix` to house machine-specific quirks, hostname, kernel parameters, and hardware overrides:
+### Step 2: Create or Adjust the Device Module (`hw/device/<name>.nix`)
+Add any machine-specific quirks, hostname, kernel parameters, and hardware overrides to `hw/device/<name>.nix`:
 
 ```nix
 # hw/device/thinkpad-x1.nix
-{ config, pkgs, ... }:
+{ config, lib, pkgs, modulesPath, ... }:
 
 {
+  imports = [
+    (modulesPath + "/installer/scan/not-detected.nix")
+  ];
+
   # 1. Hostname
   networking.hostName = "thinkpad-nixos";
 
@@ -196,17 +206,15 @@ Create `hw/device/<name>.nix` to house machine-specific quirks, hostname, kernel
 Open `flake.nix` and connect your new device module and hardware components:
 
 1. **Add to `hwModule`**:
-   Group your device module with its required GPU or peripheral definitions:
+   Group your device module with its required GPU, peripheral, or `nixos-hardware` definitions:
    ```nix
    hwModule = {
-     hardwareConfiguration = [ ./hw/hardware-configuration.nix ];
-     extra = [ ./hw/fprint/chipsailing-cs9711.nix ];
-
-     # Existing Dell Latitude 3530
+     generic = [ ./hw/device/generic.nix ];
      dell-l3530 = [
+       inputs.nixos-hardware.nixosModules.dell-latitude-3530
        ./hw/device/dell-l3530.nix
-       ./hw/gpu/intel.nix
      ];
+     extra = [ ./hw/extra ];
 
      # New machine (e.g. ThinkPad with NVIDIA)
      thinkpad-x1 = [
@@ -220,9 +228,9 @@ Open `flake.nix` and connect your new device module and hardware components:
    Define the complete host profile by combining the hardware configuration with the device modules:
    ```nix
    hostModule = {
-     generic = hwModule.hardwareConfiguration;
-     dell-l3530 = hwModule.hardwareConfiguration ++ hwModule.dell-l3530 ++ hwModule.extra;
-     thinkpad-x1 = hwModule.hardwareConfiguration ++ hwModule.thinkpad-x1;
+     generic = hwModule.generic;
+     dell-l3530 = hwModule.dell-l3530 ++ hwModule.extra;
+     thinkpad-x1 = hwModule.thinkpad-x1;
    };
    ```
 
@@ -238,11 +246,11 @@ Because `flake.nix` uses `lib.mapCartesianProduct` over `host` × `desktop`, add
 Verify configuration evaluation non-destructively:
 ```sh
 nix flake check path:.
-nixos-rebuild build --flake path:$PWD#thinkpad-x1-desktop
+nixos-rebuild build --flake .#thinkpad-x1-desktop
 ```
 Deploy to the target machine:
 ```sh
-sudo nixos-rebuild switch --flake path:$PWD#thinkpad-x1-desktop
+sudo nixos-rebuild switch --flake .#thinkpad-x1-desktop
 ```
 
 ## Installation
@@ -261,7 +269,7 @@ sudo nixos-rebuild switch --flake path:$PWD#thinkpad-x1-desktop
    ```sh
    sudo nixos-generate-config --root /mnt --no-filesystems
    ```
-6. Copy it into the flake:
+6. Copy it into the generic host profile:
    ```sh
    ./cp-hwconf.sh
    ```
@@ -269,7 +277,7 @@ sudo nixos-rebuild switch --flake path:$PWD#thinkpad-x1-desktop
    ```sh
    sudo nixos-install --flake .#generic-gnome --no-root-password
    ```
-   Use `generic-nogui` for a headless install, `generic-kde`/`generic-cosmic` for the other desktops, or a `dell-l3530-*` variant on that machine.
+   Use `generic-nogui` for a headless install, `generic-kde`/`generic-cosmic` for the other desktops, or a `dell-l3530-*` variant on that machine (which already embeds its hardware configuration).
 8. Reboot into the new system and set passwords — `users.nix` ships with blank password hashes:
    ```sh
    sudo passwd faeizmahrus
@@ -285,7 +293,7 @@ One-time setup:
 1. In the UEFI firmware, reset Secure Boot to **Setup Mode** (usually named "Erase/Clear all Secure Boot keys") and leave Secure Boot itself **disabled** for now.
 2. Boot into NixOS and rebuild:
    ```sh
-   sudo nixos-rebuild switch --flake path:$PWD#<config>
+   sudo nixos-rebuild switch --flake .#<config>
    ```
    Bootloader installation generates keys under `/var/lib/sbctl` if none exist, signs the Limine EFI binary, and enrolls your keys together with the Microsoft and firmware-builtin certificates.
 3. Reboot into the firmware and **enable Secure Boot**.
@@ -315,15 +323,15 @@ nix flake check path:.
 ```
 Or build a specific configuration non-destructively:
 ```sh
-nixos-rebuild build --flake path:$PWD#<config>
+nixos-rebuild build --flake .#dell-l3530-desktop
 ```
 
 ### Deploying changes
 Deploy active configuration to the system:
 ```sh
-sudo nixos-rebuild switch --flake path:$PWD#generic-desktop
+sudo nixos-rebuild switch --flake .#dell-l3530-desktop
 ```
-> Note: We use `path:$PWD` (or `path:.`) so Nix can read files not tracked by Git (such as `hw/hardware-configuration.nix`).
+> Note: If using uncommitted files in `./hw/device/generic.nix`, use `path:.` or `path:$PWD` so Nix can read them. Fully tracked devices (such as `dell-l3530-*`) can be deployed directly with `.#<config>`.
 
 ## Upgrading to a new NixOS release
 
