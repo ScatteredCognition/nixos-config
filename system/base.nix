@@ -155,7 +155,7 @@
   # fish + zsh
   programs = {
     fish.enable = true;
-    zsh.enable = true;
+    # zsh.enable = true; # why ship extra bloat
     # nix-ld.enable = true; # hacky but what can you do
   };
 

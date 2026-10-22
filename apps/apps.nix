@@ -108,7 +108,8 @@
       pkgs.docker-compose
     ]
 
-    # Distrobox gui
+    # Distrobox/podman gui
+    ++ [ pkgs.pods ]
     ++ (
       if config.services.desktopManager.gnome.enable then
         # For GNOME
