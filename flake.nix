@@ -7,6 +7,7 @@
   # Inputs
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
+    nixos-hardware.url = "github:ScatteredCognition/nixos-hardware/dell-latitude-3530";
 
     # disko
     disko = {
@@ -41,36 +42,30 @@
 
   # Outputs
   outputs =
-    {
-      self,
-      nixpkgs,
-      ...
-    }@inputs: # destructures the previous variables into individual keys
+    inputs:
 
     # Define modules
     let
-      inherit (nixpkgs) lib;
+      lib = inputs.nixpkgs.lib;
 
       # hardware-specific stuff
       hwModule = {
-        # hardware-configuration.nix
-        hardwareConfiguration = [ ./hw/hardware-configuration.nix ];
-
-        # add other hw stuff here
-        # Extra hardware
-        extra = [ ./hw/fprint/chipsailing-cs9711.nix ];
-
+        # generic
+        generic = [ ./hw/device/generic.nix ];
         # Dell Latitude 3530
         dell-l3530 = [
+          inputs.nixos-hardware.nixosModules.dell-latitude-3530
           ./hw/device/dell-l3530.nix
-          ./hw/gpu/intel.nix
         ];
+
+        # Extra hardware
+        extra = [ ./hw/extra ];
       };
 
       # Hosts, devices to deploy on
       hostModule = {
-        generic = hwModule.hardwareConfiguration;
-        dell-l3530 = hwModule.hardwareConfiguration ++ hwModule.dell-l3530 ++ hwModule.extra;
+        generic = hwModule.generic;
+        dell-l3530 = hwModule.dell-l3530 ++ hwModule.extra;
       };
 
       # Language stuff
@@ -107,9 +102,7 @@
         let
           commonDesktopModules = [
             ./system/base-desktop.nix # base-desktop core
-            ./apps/apps.nix # Apps etc
-            ./apps/app-fixes.nix
-            ./apps/app-extras.nix
+            ./apps # apps etc
             ./misc/fixes/usr-fix.nix # Misc
           ];
         in
@@ -140,7 +133,7 @@
           (
             { host, desktop }:
             lib.nameValuePair "${host}-${desktop}" (
-              nixpkgs.lib.nixosSystem {
+              lib.nixosSystem {
                 specialArgs = { inherit inputs; };
                 modules = baseSystem ++ desktopModule.${desktop} ++ hostModule.${host};
               }
