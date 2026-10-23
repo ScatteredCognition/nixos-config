@@ -35,4 +35,6 @@
         ]
       );
   };
+
+  imports = [ ./home-manager.nix ];
 }

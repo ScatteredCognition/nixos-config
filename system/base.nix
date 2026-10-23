@@ -66,6 +66,7 @@
 
   # Networking
   networking = {
+    firewall.enable = lib.mkDefault true;
     hostName = lib.mkDefault config.system.nixos.distroId; # set this in ./misc/hw/<hardware_name>.nix
     networkmanager.enable = true;
   };

@@ -6,7 +6,7 @@
   services.userborn.enable = true;
 
   imports = [
-    ./faeizmahrus.nix
-    ./guest.nix
+    ./faeizmahrus
+    ./guest
   ];
 }

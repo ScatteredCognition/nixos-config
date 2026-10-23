@@ -1,0 +1,6 @@
+# home-manager.nix
+{ ... }:
+
+{
+
+}

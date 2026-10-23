@@ -22,12 +22,6 @@
     ];
   };
 
-  # Disable firewall
-  networking = {
-    firewall.enable = false; # Disable firewall coz too many issues
-
-  };
-
   # Fonts stuff handled in base.nix
   # Timezone and locale stuff handled in base.nix
 

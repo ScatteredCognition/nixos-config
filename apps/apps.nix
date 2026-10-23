@@ -9,6 +9,7 @@
   pkgs,
   inputs,
   config,
+  lib,
   ...
 }:
 
@@ -128,7 +129,10 @@
     ];
 
   # Cloudflare WARP
-  services.cloudflare-warp.enable = true;
+  services.cloudflare-warp = {
+    enable = true;
+    openFirewall = true;
+  };
 
   # LocalSend
   programs.localsend = {
@@ -179,6 +183,28 @@
   programs.appimage = {
     enable = true;
     binfmt = true;
+  };
+
+  # Firewall config for apps
+  networking.firewall = {
+    enable = true;
+
+    # Fixes Cloudflare WARP and multi-routing drops
+    checkReversePath = lib.mkIf config.services.cloudflare-warp.enable "loose";
+
+    # idk what this does AI told me to include this
+    trustedInterfaces =
+      # For Cloudflare WARP
+      (lib.optionals config.services.cloudflare-warp.enable [ "CloudflareWARP" ])
+      # For VMWare
+      ++ (lib.optionals config.virtualisation.vmware.host.enable [
+        "vmnet1"
+        "vmnet8"
+      ]);
+
+    # Set 6769 in qBittorrent
+    allowedTCPPorts = [ 6769 ];
+    allowedUDPPorts = [ 6769 ];
   };
 
 }
