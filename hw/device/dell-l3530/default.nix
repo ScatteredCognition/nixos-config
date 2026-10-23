@@ -6,6 +6,9 @@
   # Set hostname
   networking.hostName = "dell-nixos";
 
+  # Set root disk
+  disko.devices.disk.main.device = "/dev/nvme0n1";
+
   # import hardware-configuration.nix
   imports = [
     ./hardware-configuration.nix

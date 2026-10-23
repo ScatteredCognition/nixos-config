@@ -4,7 +4,10 @@
 
 {
   # Set hostname
-  networking.hostName = "dell-nixos";
+  networking.hostName = "generic-nixos";
+
+  # Set root disk
+  disko.devices.disk.main.device = "/dev/sda1";
 
   # import hardware-configuration.nix
   imports = [

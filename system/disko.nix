@@ -1,11 +1,13 @@
 # disko.nix
 # sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko/latest -- --mode destroy,format,mount ./disko.nix
+{ lib, inputs, ... }:
 
 {
+  imports = [ inputs.disko.nixosModules.disko ];
   disko.devices = {
     disk = {
       main = {
-        device = "/dev/nvme0n1"; # use lsblk to find this
+        device = lib.mkDefault "/dev/null"; # declare in hw/device/<device>
         type = "disk";
         content = {
           type = "gpt";

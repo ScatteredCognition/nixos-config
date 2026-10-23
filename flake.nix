@@ -18,7 +18,7 @@
     # nix-flatpak
     nix-flatpak = {
       url = "github:gmodena/nix-flatpak";
-      inputs.nixpkgs.follows = "nixpkgs";
+      # inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # zen browser
@@ -69,27 +69,16 @@
         dell-l3530 = hwModule.dell-l3530 ++ hwModule.extra;
       };
 
-      # Inputs module
-      # Needed for baseModule as they pull in disko deps and whatnot
-      inputsModule = [
-        inputs.disko.nixosModules.disko
-        inputs.nix-flatpak.nixosModules.nix-flatpak
-      ];
-
       # base
       ## Hardware/host-specific stuff separated out into hostModule
-      baseModule =
-        inputsModule # Include flake inputs
-        ++ [
-          # System + language stuff
-          ./system
-          # Users
-          ./users
+      baseModule = [
+        ./system # System + language stuff
+        ./users # Users
 
-          # dirty cache writeback fix
-          ./misc/fixes/disk-writeback-fix.nix
-          ./misc/tweaks/karg-tweaks.nix
-        ];
+        # dirty cache writeback fix
+        ./misc/fixes/disk-writeback-fix.nix
+        ./misc/tweaks/karg-tweaks.nix
+      ];
 
       # base-desktop
       desktopModule =
