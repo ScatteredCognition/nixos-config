@@ -4,4 +4,7 @@
 { lib, ... }:
 {
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+
+  # Set hostname
+  networking.hostName = "generic-nixos";
 }

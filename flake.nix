@@ -51,11 +51,12 @@
       # hardware-specific stuff
       hwModule = {
         # generic
-        generic = [ ./hw/device/generic.nix ];
+        generic = [ ./hw/device/generic ];
+
         # Dell Latitude 3530
         dell-l3530 = [
           inputs.nixos-hardware.nixosModules.dell-latitude-3530
-          ./hw/device/dell-l3530.nix
+          ./hw/device/dell-l3530
         ];
 
         # Extra hardware
@@ -66,11 +67,6 @@
       hostModule = {
         generic = hwModule.generic;
         dell-l3530 = hwModule.dell-l3530 ++ hwModule.extra;
-      };
-
-      # Language stuff
-      langModule = {
-        bn_BD = [ ./misc/lang/bn_BD.nix ];
       };
 
       # Inputs module
@@ -85,25 +81,24 @@
       baseModule =
         inputsModule # Include flake inputs
         ++ [
-          # System stuff
-          ./system/base.nix
-          ./system/disko.nix
-          ./system/zram.nix
-          ./system/tpm2.nix
-          ./system/users.nix
+          # System + language stuff
+          ./system
+          # Users
+          ./users
 
           # dirty cache writeback fix
           ./misc/fixes/disk-writeback-fix.nix
-          ./misc/karg-tweaks.nix
+          ./misc/tweaks/karg-tweaks.nix
         ];
 
       # base-desktop
       desktopModule =
         let
           commonDesktopModules = [
-            ./system/base-desktop.nix # base-desktop core
+            ./desktop/base-desktop.nix # base-desktop core
+            ./desktop/lang-extra # extra language stuff
             ./apps # apps etc
-            ./misc/fixes/usr-fix.nix # Misc
+            ./misc/fixes/usr-fix.nix # usr fix
           ];
         in
         rec {
@@ -116,14 +111,6 @@
           cosmic = commonDesktopModules ++ [ ./desktop/cosmic-desktop.nix ];
         };
 
-      # Define baseSystem, an abstraction over baseModule for ease of use in mkSystem
-      baseSystem =
-        baseModule # Bare basic system config
-
-        # Add language support here
-        # English is added by default
-        ++ langModule.bn_BD;
-
     in
 
     # Main system config part
@@ -135,7 +122,7 @@
             lib.nameValuePair "${host}-${desktop}" (
               lib.nixosSystem {
                 specialArgs = { inherit inputs; };
-                modules = baseSystem ++ desktopModule.${desktop} ++ hostModule.${host};
+                modules = baseModule ++ desktopModule.${desktop} ++ hostModule.${host};
               }
             )
           )

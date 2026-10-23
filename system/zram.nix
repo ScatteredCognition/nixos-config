@@ -1,8 +1,9 @@
 # zram.nix
+{ lib, ... }:
 
 {
   zramSwap = {
-    enable = true;
+    enable = lib.mkDefault true;
     # best compression ratio for zram
     algorithm = "zstd";
     # zram device size = 50% of RAM
