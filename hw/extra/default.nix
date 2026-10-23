@@ -2,5 +2,5 @@
 { ... }:
 
 {
-  imports = [ ./chipsailing-cs9711.nix ];
+  imports = [ ./chipsailing-cs9711 ];
 }

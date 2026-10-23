@@ -10,7 +10,7 @@
 {
   users.users.guest = {
     isNormalUser = true;
-    HashedPassword = "";
+    hashedPassword = ""; # set blank password for user
 
     # User shell
     shell = pkgs.fish;

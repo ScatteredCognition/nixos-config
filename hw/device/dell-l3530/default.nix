@@ -9,6 +9,6 @@
   # import hardware-configuration.nix
   imports = [
     ./hardware-configuration.nix
-    ../gpu/intel # for intel iGPU
+    ../../gpu/intel # for intel iGPU
   ];
 }

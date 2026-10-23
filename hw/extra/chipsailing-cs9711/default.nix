@@ -1,4 +1,4 @@
-# chipsailing-cs9711.nix
+# default.nix
 { pkgs, ... }:
 
 let
