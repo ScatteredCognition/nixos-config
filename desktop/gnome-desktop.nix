@@ -92,7 +92,7 @@
 
   # Install extra apps
   ++ [
-    pkgs.mission-center
+    pkgs.resources
     pkgs.refine
     pkgs.peazip
   ];
