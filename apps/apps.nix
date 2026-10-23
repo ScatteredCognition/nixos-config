@@ -187,8 +187,6 @@
 
   # Firewall config for apps
   networking.firewall = {
-    enable = true;
-
     # Fixes Cloudflare WARP and multi-routing drops
     checkReversePath = lib.mkIf config.services.cloudflare-warp.enable "loose";
 
