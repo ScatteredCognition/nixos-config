@@ -103,17 +103,14 @@
       defaultFonts = {
         serif = [
           "Noto Serif"
-          "Noto Serif CJK SC"
           "Noto Color Emoji"
         ];
         sansSerif = [
           "Noto Sans"
-          "Noto Sans CJK SC"
           "Noto Color Emoji"
         ];
         monospace = [
           "Noto Sans Mono"
-          "Noto Sans Mono CJK SC"
           "Noto Color Emoji"
         ];
         emoji = [
