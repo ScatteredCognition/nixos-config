@@ -8,4 +8,19 @@
     ibus.engines = with pkgs; [ openbangla-keyboard ];
   };
 
+  # Add Bengali to default fontconfig fonts
+  fonts.fontconfig.defaultFonts = {
+    serif = [
+      "Noto Serif Bengali"
+    ];
+    sansSerif = [
+      "Noto Sans Bengali"
+    ];
+    monospace = [
+      # No monospace fonts for Bengali
+    ];
+    emoji = [
+      # Not applicable
+    ];
+  };
 }
