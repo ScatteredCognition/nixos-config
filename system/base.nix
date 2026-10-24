@@ -81,6 +81,7 @@
   };
 
   # Fonts stuff
+  # Also check: https://github.com/NixOS/nixpkgs/issues/578274
   fonts = {
     enableDefaultPackages = false; # Pulls in dogshit fonts
     fontDir.enable = true; # symlinks all host fonts to /run/current-system/sw/share/X11/fonts
