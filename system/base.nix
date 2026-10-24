@@ -82,8 +82,7 @@
 
   # Fonts stuff
   fonts = {
-    enableDefaultPackages = true; # Default unicode fonts
-    fontconfig.useEmbeddedBitmaps = true;
+    enableDefaultPackages = false; # Pulls in dogshit fonts
     fontDir.enable = true; # symlinks all host fonts to /run/current-system/sw/share/X11/fonts
 
     packages = [
@@ -92,8 +91,37 @@
 
       # Install Noto fonts
       pkgs.noto-fonts
+      pkgs.noto-fonts-cjk-sans
+      pkgs.noto-fonts-cjk-serif
       pkgs.noto-fonts-color-emoji
+      pkgs.noto-fonts-monochrome-emoji
     ];
+
+    fontconfig = {
+      useEmbeddedBitmaps = true;
+      # Overrides so fonts don't melt my eyes
+      defaultFonts = {
+        serif = [
+          "Noto Serif"
+          "Noto Serif CJK SC"
+          "Noto Color Emoji"
+        ];
+        sansSerif = [
+          "Noto Sans"
+          "Noto Sans CJK SC"
+          "Noto Color Emoji"
+        ];
+        monospace = [
+          "Noto Sans Mono"
+          "Noto Sans Mono CJK SC"
+          "Noto Color Emoji"
+        ];
+        emoji = [
+          "Noto Color Emoji"
+          "Noto Emoji"
+        ];
+      };
+    };
   };
 
   # Hardware stuff
