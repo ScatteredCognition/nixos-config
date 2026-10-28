@@ -32,12 +32,6 @@
       url = "github:fufexan/nix-gaming";
       # inputs.nixpkgs.follows = "nixpkgs"; # forces compile from source
     };
-
-    # antigravity-nix
-    antigravity-nix = {
-      url = "github:jacopone/antigravity-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   # Outputs

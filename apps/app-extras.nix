@@ -20,10 +20,6 @@
     zen-browser-flake.enable = lib.mkEnableOption "zen-browser-flake (precompiled)" // {
       default = true;
     };
-    # antigravity-nix
-    antigravity-nix.enable = lib.mkEnableOption "antigravity-nix (precompiled)" // {
-      default = true;
-    };
   };
 
   config = {
