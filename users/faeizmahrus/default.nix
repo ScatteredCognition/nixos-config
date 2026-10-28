@@ -15,15 +15,5 @@
 
     # User shell
     shell = pkgs.fish;
-
-    # Extra programs and shi
-    packages = [
-      # AI Agent shi
-      pkgs.python3
-      pkgs.nodejs
-      pkgs.jq
-    ];
   };
-
-  imports = [ ./home-manager.nix ];
 }
