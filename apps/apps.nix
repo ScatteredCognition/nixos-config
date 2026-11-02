@@ -65,6 +65,7 @@
       pkgs.zed-editor
       pkgs.onlyoffice-desktopeditors
       pkgs.cine # VLC is glitchy and buggy
+      pkgs.gpu-screen-recorder-gtk # reqires programs.gpu-screen-recorder.enable = true;
       pkgs.qbittorrent
       pkgs.naps2
       pkgs.foliate
@@ -127,6 +128,9 @@
       pkgs.aria2
       pkgs.android-tools
     ];
+
+  # GPU Screen Recorder
+  programs.gpu-screen-recorder.enable = true;
 
   # Cloudflare WARP
   services.cloudflare-warp = {
