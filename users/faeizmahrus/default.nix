@@ -20,8 +20,8 @@
     services.syncthing = {
       enable = true;
       openDefaultPorts = true;
-      user = "faeizmahrus";
-      group = "users";
+      user = "faeizmahrus"; # runs as my user
+      group = "users"; # runs under the users group
       dataDir = config.users.users.faeizmahrus.home;
       configDir = "${config.users.users.faeizmahrus.home}/.config/syncthing";
     };
