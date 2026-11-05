@@ -7,7 +7,12 @@
   # Inputs
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
-    nixos-hardware.url = "github:ScatteredCognition/nixos-hardware/dell-latitude-3530"; # Temporary, change to upstream when commit merged
+
+    # nixos-hardware
+    nixos-hardware = {
+      url = "github:NixOS/nixos-hardware";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # disko
     disko = {

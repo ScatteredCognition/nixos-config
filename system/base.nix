@@ -54,6 +54,7 @@
             extraArgs = [
               "--microsoft"
               "--firmware-builtin"
+              "--ignore-immutable"
             ];
           };
         };
