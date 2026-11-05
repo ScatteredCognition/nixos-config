@@ -15,5 +15,15 @@
 
     # User shell
     shell = pkgs.fish;
+
+    # syncthing
+    services.syncthing = {
+      enable = true;
+      openDefaultPorts = true;
+      user = "faeizmahrus";
+      group = "users";
+      dataDir = config.users.users.faeizmahrus.home;
+      configDir = "${config.users.users.faeizmahrus.home}/.config/syncthing";
+    };
   };
 }
