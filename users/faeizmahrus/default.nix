@@ -15,15 +15,15 @@
 
     # User shell
     shell = pkgs.fish;
+  };
 
-    # syncthing
-    services.syncthing = {
-      enable = true;
-      openDefaultPorts = true;
-      user = "faeizmahrus"; # runs as my user
-      group = "users"; # runs under the users group
-      dataDir = config.users.users.faeizmahrus.home;
-      configDir = "${config.users.users.faeizmahrus.home}/.config/syncthing";
-    };
+  # syncthing
+  services.syncthing = {
+    enable = true;
+    openDefaultPorts = true;
+    user = "faeizmahrus"; # runs as my user
+    group = "users"; # runs under the users group
+    dataDir = config.users.users.faeizmahrus.home;
+    configDir = "${config.users.users.faeizmahrus.home}/.config/syncthing";
   };
 }
