@@ -110,8 +110,8 @@
       pkgs.docker-compose
     ]
 
-    # Distrobox/podman gui
-    ++ [ pkgs.pods ]
+    # Distrobox/podman/appimage gui
+    ++ [ pkgs.pods pkgs.gearlever ]
     ++ (
       if config.services.desktopManager.gnome.enable then
         # For GNOME
