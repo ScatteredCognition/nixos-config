@@ -205,8 +205,9 @@
       ]);
 
     # Set 6769 in qBittorrent
-    allowedTCPPorts = [ 6769 ];
-    allowedUDPPorts = [ 6769 ];
+    # ports 22000 and 21027 for syncthing
+    allowedTCPPorts = [ 6769 22000 ];
+    allowedUDPPorts = [ 6769 22000 21027 ];
   };
 
 }
