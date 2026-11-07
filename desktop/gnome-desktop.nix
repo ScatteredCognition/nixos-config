@@ -31,6 +31,7 @@
     pkgs.gnomeExtensions.alphabetical-app-grid
     pkgs.gnomeExtensions.appindicator
     pkgs.gnomeExtensions.caffeine
+    pkgs.gnomeExtensions.legacy-gtk3-theme-scheme-auto-switcher
   ]
 
   # Grab Gst plugins (must be babysitted after each major upgrade)
@@ -121,6 +122,7 @@
             alphabetical-app-grid.extensionUuid
             appindicator.extensionUuid
             caffeine.extensionUuid
+            legacy-gtk3-theme-scheme-auto-switcher.extensionUuid
           ];
         };
 
