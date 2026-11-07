@@ -25,9 +25,21 @@
     ];
   };
 
+  # linux-latest and linux-lts specializations
+  specialisation = {
+    linux-latest.configuration = {
+      system.nixos.tags =  [ "linux-latest" ];
+      boot.kernelPackages = pkgs.linuxPackages_latest;
+    };
+
+    linux-lts.configuration = {
+      system.nixos.tags = [ "linux-lts" ];
+      boot.kernelPackages = pkgs.linuxPackages;
+    };
+  };
+
   # Boot stuff
   boot = {
-    kernelPackages = lib.mkDefault pkgs.linuxPackages; # explicitly set Linux LTS as the default
     loader = {
       # timeout = 0; # Hides boot selector
       efi.canTouchEfiVariables = true; # Allow adding EFI boot entries, modifying NVRAM
