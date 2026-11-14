@@ -35,7 +35,7 @@
 
   # Boot stuff
   boot = {
-    kernelPackages = pkgs.linuxPackages_latest; # default is latest kernel
+    kernelPackages = lib.mkDefault pkgs.linuxPackages_latest; # default is latest kernel
     loader = {
       # timeout = 0; # Hides boot selector
       efi.canTouchEfiVariables = true; # Allow adding EFI boot entries, modifying NVRAM
