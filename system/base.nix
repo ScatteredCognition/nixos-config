@@ -25,13 +25,8 @@
     ];
   };
 
-  # linux-latest and linux-lts specializations
+  # linux-lts specialization
   specialisation = {
-    linux-latest.configuration = {
-      system.nixos.tags =  [ "linux-latest" ];
-      boot.kernelPackages = pkgs.linuxPackages_latest;
-    };
-
     linux-lts.configuration = {
       system.nixos.tags = [ "linux-lts" ];
       boot.kernelPackages = pkgs.linuxPackages;
@@ -40,6 +35,7 @@
 
   # Boot stuff
   boot = {
+    kernelPackages = pkgs.linuxPackages_latest; # default is latest kernel
     loader = {
       # timeout = 0; # Hides boot selector
       efi.canTouchEfiVariables = true; # Allow adding EFI boot entries, modifying NVRAM
