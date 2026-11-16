@@ -14,41 +14,11 @@
 }:
 
 {
-  # Set nix-gaming.enable to false during first rebuild after enabling cachix
-  # Then do a reboot, set it to true, rebuild once more for the cachix cache to be active
-  custom = {
-    # zen-browser-flake.enable = true;
-    # nix-gaming.enable = false;
-    # antigravity-nix.enable = false;
-  };
-
-  # workaround for NixOS/nixpkgs#338367: point winetricks at the real
-  # (unwrapped) binaries so its arch/WoW64 detection works
-  # set wine = to the wine version you are using rn
-  environment.sessionVariables =
-    if (config.custom.nix-gaming.enable or false) then
-      let
-        wine = inputs.nix-gaming.packages.${pkgs.stdenv.hostPlatform.system}.wine-tkg;
-      in
-      {
-        WINE_BIN = "${wine}/bin/.wine";
-        # WINESERVER_BIN = "${wine}/bin/.wineserver";
-      }
-    else
-      { };
-
   environment.systemPackages =
 
-    # Main browser
-    (
-      if (config.custom.zen-browser-flake.enable or false) then
-        [ inputs.zen-browser-flake.packages.${pkgs.stdenv.hostPlatform.system}.default ]
-      else
-        [ pkgs.firefox ] # backup if zen breaks
-    )
-
     # Extra browsers
-    ++ [
+    [
+      pkgs.firefox
       (pkgs.chromium.override { enableWideVine = true; })
       pkgs.tor-browser
     ]
@@ -74,19 +44,10 @@
     ]
 
     # Wine
-    # Installs nix-gaming winetricks if config.custom.nix-gaming.enable is true, otherwise falls back to system wine
-    ++ (
-      if (config.custom.nix-gaming.enable or false) then
-        (with inputs.nix-gaming.packages.${pkgs.stdenv.hostPlatform.system}; [
-          wine-tkg
-          winetricks-git
-        ])
-      else
-        [
-          pkgs.wineWow64Packages.staging
-          pkgs.winetricks
-        ]
-    )
+    ++ [
+      pkgs.wineWow64Packages.stable
+      pkgs.winetricks
+    ]
 
     # Python, node and jq for when you need it
     ++ [
@@ -192,14 +153,15 @@
   # Firewall config for apps
   networking.firewall = {
     # Fixes Cloudflare WARP and multi-routing drops
+    # https://github.com/NixOS/nixpkgs/issues/504119
     checkReversePath = lib.mkIf config.services.cloudflare-warp.enable "loose";
 
-    # idk what this does AI told me to include this
+    # These interfaces will bypass the firewall entirely
     trustedInterfaces =
-      # For Cloudflare WARP
-      (lib.optionals config.services.cloudflare-warp.enable [ "CloudflareWARP" ])
+      # For Cloudflare WARP (unnecessary, still kept for easy revert)
+      # (lib.optionals config.services.cloudflare-warp.enable [ "CloudflareWARP" ])
       # For VMWare
-      ++ (lib.optionals config.virtualisation.vmware.host.enable [
+      (lib.optionals config.virtualisation.vmware.host.enable [
         "vmnet1"
         "vmnet8"
       ]);

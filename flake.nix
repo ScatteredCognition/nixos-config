@@ -25,18 +25,6 @@
       url = "github:gmodena/nix-flatpak";
       # inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    # zen browser
-    zen-browser-flake = {
-      url = "github:0xc000022070/zen-browser-flake";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    # nix-gaming
-    nix-gaming = {
-      url = "github:fufexan/nix-gaming";
-      # inputs.nixpkgs.follows = "nixpkgs"; # forces compile from source
-    };
   };
 
   # Outputs
